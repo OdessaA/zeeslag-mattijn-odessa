@@ -13,6 +13,7 @@ from tkinter import messagebox
 import os
 import random
 
+
 # Grootte van het bord
 BORD_GROOTTE = 10
 
@@ -29,7 +30,7 @@ class ZeeslagGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Zeeslag")
-
+     
         # Laad afbeeldingen
         self.images = {
             "raak": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit.png")),
