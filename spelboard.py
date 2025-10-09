@@ -1,12 +1,12 @@
 #Spelboard.py
 '''
-In dit bestand word het spelbord van de zeeslag bijgehouden, en de graphical GUI bijgehouden
+In dit bestand word het spelbord van de zeeslag, en de graphical GUI bijgehouden
 
 Gemaakt door:   Mattijn Thijert
                 ...
 '''
 #---------------------------------------------------------------------------------
-"""CODE WERKT NOG NIET EN KAN DUS OOK NOG NIET RUNNEN"""
+"""De functies `schiet_op` en `toon_help` hebben nog aanpassing nodig"""
 #---------------------------------------------------------------------------------
 import tkinter as tk
 from tkinter import messagebox
@@ -70,7 +70,9 @@ class ZeeslagGUI:
     def toon_help(self):
         messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = ZeeslagGUI(root)
-    root.mainloop()
+
+# -- testfunctie om te kijken naar aanpassingen
+#if __name__ == "__main__":
+#    root = tk.Tk()
+#    app = ZeeslagGUI(root)
+#    root.mainloop()
