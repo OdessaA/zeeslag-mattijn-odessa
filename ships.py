@@ -84,7 +84,7 @@ class Ship: # Parent-klasse voor alle schepen.
 
 class TweeSchip(Ship): 
     def __init__(self): 
-        super().__init__(2, name="Tweeship")
+        super().__init__(2, name="Tweeboot")
 
 class DrieSchip(Ship): 
     def __init__(self):
