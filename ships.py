@@ -1,36 +1,60 @@
 """
-ships.py definieert de Ship-klasse voor het spel. 
+ships.py definieert de Ship klassen voor het spel. 
+
+De module bevat: 
+    - Een parent-klasse met gemeenschappelijke functies. 
+    - Subklassen 
+
+    Deze opzet gebruikt overerving zodat elk type schip automatisch 
+    de juiste lengte en naam krijgt. 
 """
 
-class Ship:
+class Ship: # Parent-klasse voor alle schepen. 
     """
-    Een schip in het zeeslag spel. Bestaat uit een aantal vakjes (lentgh) 
-    en lijst met coördinaten (rij, kolom). 
+    Parent klasse voor alle schepen in het spel. 
+
+    Elk schip bestaat uit een bepaalde lengte (aantal vakjes dat het inneemt) en 
+    een lijst met coördinaten die aangeven waar het schip zich op het spelbord bevindt. 
     
     Attributen:
+        name (str): de naam van het schip (bijv. 'Tweeboot', 'Drieboot').
         length (int): hoeveel vakjes het schip inneemt. 
-        coordinates (list): lijst met (rij, kolom)-paren waar het schip ligt. 
+        coordinates (list): lijst met (rij, kolom)-paren die de positie van het schip aangeven. 
     """
-    def __init__(self, length, coordinates=None):
+
+    def __init__(self, length, name="Onbekend"):
         """
         Initialiseert een nieuw schip. 
 
         Arguments: 
             length(int): hoeveel vakjes het schip innneemt.
-            coordinates (list of None): een optinele lijst van coördinaten als (rij, kolom)-paren.
-                                        Als None, word het schip gemaakt zonder meteen coördinaten mee te geven. 
+            name (str): 
         """
-        self.length = int(length)
-        self.coordinates = coordinates if coordinates is not None else [] # Zorgt dat coordinates altijd een lijst is 
+        self.name = name
+        self.length = length 
+        self.coordinates = []
+    def set_coordinates(self, coords):
+        """
+        Plaatst het schip op het bord door coördinaten in te vullen 
+
+        Argumenten: 
+            coords (list): een lijst met de vakjes waar het schip ligt. 
+            Elk vakje als (rij, kolom). 
+        
+        Raises: 
+            ValueError: Als het aantal coördinaten niet overeenkomt met de lengte.
+        """
+        if len(coords) != self.length: # controleert of het aantal opgegeven vakjes overeenkomt met de lente van het schip. 
+            raise ValueError("Aantal coördinaten komt niet overeen met de lengte van het schip.")
+        self.coordinates = coords 
 
     def occupies(self, row, col):
         """
         Controleert of het schip het vakje (row, col) bezet. 
 
         Arguments: 
-            row (int): Het rijnummer (0-index).
-            col(int): Het kolomnummer (0-index). 
-
+            row (int): Rij index op het bord
+            col(int): Kolom index op het bord 
         Returns: 
             bool: True als het vakje deel uitmaakt van het schip, anders False.
         """
@@ -46,29 +70,8 @@ class Ship:
         Returns:
             bool: True als alle coördinaten van het schip in hits voorkomen, anders False.
         """
-
-        if not self.coordinates or len(self.coordinates) != self.length: 
-            return False
-        for coord in self.coordinates:
-            if coord not in hits: 
-                return False
-        return True
+        return all(coord in hits for coord in self.coordinates)
     
-    def set_coordinates(self, coords):
-        """
-        Stel de coördinaten van het schip in.
-
-        Argumenten: 
-            coords (list): Lijst van alle (row, col)-paren met de exacte posities. 
-        
-        Raises: 
-            ValueError: Als het aantal coördinaten niet overeenkomt met de lengte.
-        """
-
-        if len(coords) != self.length:
-            raise ValueError("Aantal coördinaten komt niet overeen met de lengte van het schip.")
-        self.coordinates = coords[:]
-
     def __repr__(self):
         """
         Geeft een tekstrepresentatie van het schip terug.
@@ -78,3 +81,19 @@ class Ship:
         """
     
         return f"Schip lengte = {self.length}\nSchip coördinaten = {self.coordinates}"
+
+class TweeSchip(Ship): 
+    def __init__(self): 
+        super().__init__(2, name="Tweeship")
+
+class DrieSchip(Ship): 
+    def __init__(self):
+        super().__init__(3, name="Drieboot")
+
+class VierSchip(Ship): 
+    def __init__(self):
+        super().__init__(4, name="Vierboot")
+
+class VijfSchip(Ship): 
+    def __init__(self):
+        super().__init__(5, name="Vijfboot")
