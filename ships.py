@@ -1,4 +1,11 @@
-""" ships.py bevat een parentklasse (Ship) en subklassen voor elke schipsoort. """
+""" 
+ships.py bevat een parentklasse (Ship) en subklassen voor elke schipsoort.
+
+Elk Ship bevat: 
+    - De naam van het schip. (bijv. "Tweeboot").
+    - De lengte van het schip: het aantal vakjes dat het schip in beslag neemt. 
+    - Een lijst van coördinaten die aangeven waar een schip precies ligt. (bijv. [(1,2), (1,3), (1,4)]).
+"""
 
 class Ship: # Parent-klasse voor alle schepen. 
     """ Parentklasse voor schepen met naam, lengte en coördinaten. """
@@ -11,14 +18,14 @@ class Ship: # Parent-klasse voor alle schepen.
 
     def set_coordinates(self, coords):
         """ Stelt de coördinaten van het schip in. """
-        if len(coords) != self.length:
+        if len(coords) != self.length: 
             raise ValueError("Aantal coördinaten komt niet overeen met de lengte van het schip.")
         self.coordinates = coords 
 
     def occupies(self, row, col):
         """ Checkt of een schip een bepaald vakje op het speelbord bezet. """
         for coord in self.coordinates: # Loop door alle coördinaten van het schip. 
-            if coord == (row, col): 
+            if coord == (row, col): # Als het opgegeven coördinaat in de functie gelijk is aan de coördinaat van het schip krijg je True terug. 
                 return True
         return False
     
@@ -36,7 +43,7 @@ class Ship: # Parent-klasse voor alle schepen.
 class TweeSchip(Ship): 
     """ Schip van twee vakjes. """
     def __init__(self): 
-        super().__init__(2, name="Tweeboot")
+        super().__init__(2, name="Tweeboot") 
 
 class DrieSchip(Ship): 
     """Schip van drie vakjes. """
