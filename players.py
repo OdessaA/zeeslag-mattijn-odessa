@@ -10,7 +10,7 @@ Elke speler heeft:
     Gemaakt door:   Odessa Al-Dib
 """
 
-from ships import TweeSchip, DrieSchip, VierSchip, VijfSchip
+from ships import Patrouilleschip, Slagschip, Onderzeeër, Torpedobootjager, Vliegdekschip
 
 class Player: 
     def __init__(self, name):

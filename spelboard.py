@@ -11,8 +11,7 @@ Gemaakt door:   Mattijn Thijert
 import tkinter as tk
 from tkinter import messagebox
 import os
-from ships import Ship, TweeSchip, DrieSchip, VierSchip, VijfSchip
-
+from ships import Ship, Patrouilleschip, Slagschip, Onderzeeër, Torpedobootjager, Vliegdekschip
 
 # Grootte van het bord
 BORD_GROOTTE = 10
@@ -86,13 +85,13 @@ class ZeeslagGUI:
     def plaats_schepen(self):
         """Plaats de schepen op het bord (voorlopig vast)."""
         
-        schip1 = TweeSchip()
+        schip1 = Patrouilleschip()
         schip1.set_coordinates([(0, 0), (0, 1)])
 
-        schip2 = DrieSchip()
+        schip2 = Onderzeeër()
         schip2.set_coordinates([(2, 3), (3, 3), (4, 3)])
 
-        schip3 = VierSchip()
+        schip3 = Slagschip()
         schip3.set_coordinates([(6, 6), (6, 7), (6, 8), (6, 9)])
 
         self.schepen = [schip1, schip2, schip3]

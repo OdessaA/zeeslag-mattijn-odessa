@@ -42,22 +42,27 @@ class Ship: # Parent-klasse voor alle schepen.
         """ Tekstweergave van het schip. """
         return f"Schip lengte = {self.length}\nSchip coördinaten = {self.coordinates}"
 
-class TweeSchip(Ship): 
+class Patrouilleschip(Ship): 
     """ Schip van twee vakjes. """
     def __init__(self): 
-        super().__init__(2, name="Tweeboot") 
+        super().__init__(2, name="Patrouilleschip") 
 
-class DrieSchip(Ship): 
+class Onderzeeër(Ship): 
     """Schip van drie vakjes. """
     def __init__(self):
-        super().__init__(3, name="Drieboot")
+        super().__init__(3, name="Onderzeeër")
 
-class VierSchip(Ship): 
+class Torpedobootjager(Ship):
+    """Schip van drie vakjes. """
+    def __init__(self):
+        super().__init__(3, name="Torpedobootjager")
+
+class Slagschip(Ship): 
     """ Schip van vier vakjes. """
     def __init__(self):
-        super().__init__(4, name="Vierboot")
+        super().__init__(4, name="Slagschip")
 
-class VijfSchip(Ship): 
+class Vliegdekschip(Ship): 
     """ Schip van vijf vakjes. """
     def __init__(self):
-        super().__init__(5, name="Vijfboot")
+        super().__init__(5, name="Vliegdekschip")
