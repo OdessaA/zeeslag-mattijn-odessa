@@ -5,6 +5,8 @@ Elk Ship bevat:
     - De naam van het schip. (bijv. "Tweeboot").
     - De lengte van het schip: het aantal vakjes dat het schip in beslag neemt. 
     - Een lijst van coördinaten die aangeven waar een schip precies ligt. (bijv. [(1,2), (1,3), (1,4)]).
+
+    Gemaakt door:   Odessa Al-Dib
 """
 
 class Ship: # Parent-klasse voor alle schepen. 

@@ -6,6 +6,8 @@ Elke speler heeft:
     - Een naam.
     - Een lijst met schepen.
     - Een verzameling coördinaten van hits en misses.
+    
+    Gemaakt door:   Odessa Al-Dib
 """
 
 from ships import TweeSchip, DrieSchip, VierSchip, VijfSchip

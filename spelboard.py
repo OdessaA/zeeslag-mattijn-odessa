@@ -3,7 +3,7 @@
 In dit bestand word het spelbord van de zeeslag, en de graphical GUI bijgehouden
 
 Gemaakt door:   Mattijn Thijert
-                ...
+                Odessa Al-Dib
 '''
 #---------------------------------------------------------------------------------
 """De functies `schiet_op` en `toon_help` hebben nog aanpassing nodig"""
@@ -28,8 +28,8 @@ class ZeeslagGUI:
      
         # Laad afbeeldingen
         self.images = {
-            "raak": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit.png")),
-            "mis": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss.png")),
+            "hit": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit.png")),
+            "miss": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss.png")),
             "unknown": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_unknown.png"))
         }
 
@@ -48,7 +48,7 @@ class ZeeslagGUI:
         """Controleer of (x, y) een schip raakt."""
         # Optioneel: voorkomen dat je twee keer op hetzelfde vakje 'schiet'
         if (x, y) in self.hits:
-            return "mis"  # of raise/geen actie — ik kies hier 'mis' zodat GUI ermee om kan gaan
+            return "miss"  # of raise/geen actie — ik kies hier 'mis' zodat GUI ermee om kan gaan
 
         self.hits.add((x, y))
         for schip in self.schepen:
@@ -56,8 +56,8 @@ class ZeeslagGUI:
                 if schip.is_sunk(self.hits):
                     # Optioneel: geef een melding wanneer een schip gezonken is
                     messagebox.showinfo("Gezonken!", f"{schip.name} is gezonken!")
-                return "raak"
-        return "mis"
+                return "hit"
+        return "miss"
 
     def maak_spelbord(self):
         bord_frame = tk.Frame(self.root)
