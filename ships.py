@@ -1,99 +1,68 @@
-"""
-ships.py definieert de Ship klassen voor het spel. 
+""" 
+ships.py bevat een parentklasse (Ship) en subklassen voor elke schipsoort.
 
-De module bevat: 
-    - Een parent-klasse met gemeenschappelijke functies. 
-    - Subklassen 
+Elk Ship bevat: 
+    - De naam van het schip. (bijv. "Tweeboot").
+    - De lengte van het schip: het aantal vakjes dat het schip in beslag neemt. 
+    - Een lijst van coördinaten die aangeven waar een schip precies ligt. (bijv. [(1,2), (1,3), (1,4)]).
 
-    Deze opzet gebruikt overerving zodat elk type schip automatisch 
-    de juiste lengte en naam krijgt. 
+    Gemaakt door:   Odessa Al-Dib
 """
 
 class Ship: # Parent-klasse voor alle schepen. 
-    """
-    Parent klasse voor alle schepen in het spel. 
-
-    Elk schip bestaat uit een bepaalde lengte (aantal vakjes dat het inneemt) en 
-    een lijst met coördinaten die aangeven waar het schip zich op het spelbord bevindt. 
-    
-    Attributen:
-        name (str): de naam van het schip (bijv. 'Tweeboot', 'Drieboot').
-        length (int): hoeveel vakjes het schip inneemt. 
-        coordinates (list): lijst met (rij, kolom)-paren die de positie van het schip aangeven. 
-    """
+    """ Parentklasse voor schepen met naam, lengte en coördinaten. """
 
     def __init__(self, length, name="Onbekend"):
-        """
-        Initialiseert een nieuw schip. 
-
-        Arguments: 
-            length(int): hoeveel vakjes het schip innneemt.
-            name (str): 
-        """
+        """ Maakt een schip met opgegeven lengte en naam. """
         self.name = name
         self.length = length 
         self.coordinates = []
-    def set_coordinates(self, coords):
-        """
-        Plaatst het schip op het bord door coördinaten in te vullen 
 
-        Argumenten: 
-            coords (list): een lijst met de vakjes waar het schip ligt. 
-            Elk vakje als (rij, kolom). 
-        
-        Raises: 
-            ValueError: Als het aantal coördinaten niet overeenkomt met de lengte.
-        """
-        if len(coords) != self.length: # controleert of het aantal opgegeven vakjes overeenkomt met de lente van het schip. 
+    def set_coordinates(self, coords):
+        """ Stelt de coördinaten van het schip in. """
+        if len(coords) != self.length: 
             raise ValueError("Aantal coördinaten komt niet overeen met de lengte van het schip.")
         self.coordinates = coords 
 
     def occupies(self, row, col):
-        """
-        Controleert of het schip het vakje (row, col) bezet. 
-
-        Arguments: 
-            row (int): Rij index op het bord
-            col(int): Kolom index op het bord 
-        Returns: 
-            bool: True als het vakje deel uitmaakt van het schip, anders False.
-        """
-        return (row, col) in self.coordinates
+        """ Checkt of een schip een bepaald vakje op het speelbord bezet. """
+        for coord in self.coordinates: # Loop door alle coördinaten van het schip. 
+            if coord == (row, col): # Als het opgegeven coördinaat in de functie gelijk is aan de coördinaat van het schip krijg je True terug. 
+                return True
+        return False
     
     def is_sunk(self, hits):
-        """
-        Controleer of het schip volledig gezonken is. 
-        
-        Arguments: 
-            hits (set): een set met (row, col)-paren die geraakt zijn door de tegenstander. 
-        
-        Returns:
-            bool: True als alle coördinaten van het schip in hits voorkomen, anders False.
-        """
-        return all(coord in hits for coord in self.coordinates)
+        """ Geeft True als alle vakjes van het schip geraakt zijn. """
+        for coord in self.coordinates:
+            if coord not in hits: # Als één vakje nog niet geraakt is, is het schip nog niet gezonken 
+                return False
+        return True           
     
     def __repr__(self):
-        """
-        Geeft een tekstrepresentatie van het schip terug.
-
-        Returns:
-            str: een string met de lengte en de coördinaten. 
-        """
-    
+        """ Tekstweergave van het schip. """
         return f"Schip lengte = {self.length}\nSchip coördinaten = {self.coordinates}"
 
-class TweeSchip(Ship): 
+class Patrouilleschip(Ship): 
+    """ Schip van twee vakjes. """
     def __init__(self): 
-        super().__init__(2, name="Tweeboot")
+        super().__init__(2, name="Patrouilleschip") 
 
-class DrieSchip(Ship): 
+class Onderzeeër(Ship): 
+    """Schip van drie vakjes. """
     def __init__(self):
-        super().__init__(3, name="Drieboot")
+        super().__init__(3, name="Onderzeeër")
 
-class VierSchip(Ship): 
+class Torpedobootjager(Ship):
+    """Schip van drie vakjes. """
     def __init__(self):
-        super().__init__(4, name="Vierboot")
+        super().__init__(3, name="Torpedobootjager")
 
-class VijfSchip(Ship): 
+class Slagschip(Ship): 
+    """ Schip van vier vakjes. """
     def __init__(self):
-        super().__init__(5, name="Vijfboot")
+        super().__init__(4, name="Slagschip")
+
+class Vliegdekschip(Ship): 
+    """ Schip van vijf vakjes. """
+    def __init__(self):
+        super().__init__(5, name="Vliegdekschip")
