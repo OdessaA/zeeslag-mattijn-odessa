@@ -1,4 +1,4 @@
-#place_Ships
+#Place_Ships
 '''
 Zorgt ervoor dat er een boot geplaatst kan worden op een makkelijke manier
 
@@ -8,8 +8,6 @@ Gemaakt door:   Mattijn Thijert
 #---------------------------------------------------------------------------------
 """n.v.t"""
 #---------------------------------------------------------------------------------
-# place_ships_mini.py
-# place_ships_duidelijk.py
 import tkinter as tk
 from tkinter import messagebox
 from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vliegdekschip
