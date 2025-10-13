@@ -36,12 +36,24 @@ class ZeeslagGUI:
         self.hits = set()   # houdt bij welke coördinaten zijn geraakt
         self.schepen = []
 
-        self.plaats_schepen()
-        self.maak_spelbord()
+         # Rechter kolom: bediening
+        controls = tk.Frame(self.root)
+        controls.grid(row=0, column=1, sticky="n", padx=10, pady=10)
 
         # Helpknop
-        help_knop = tk.Button(root, text="Help", command=self.toon_help)
-        help_knop.pack(side=tk.RIGHT, padx=10, pady=10)
+        help_knop = tk.Button(controls, text="Help", width=10, command=self.toon_help)
+        help_knop.grid(row=0, column=0, padx=10, pady=(0, 10), sticky="e")
+
+        # Rules
+        rules_knop = tk.Button(controls, text="Regels", width=10, command=self.toon_regels)
+        rules_knop.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+
+        # Linker kolom: spelbord
+        self.bord_frame = tk.Frame(self.root)
+        self.bord_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        self.plaats_schepen()
+        self.maak_spelbord()
 
     def schiet_op(self, x, y):
         """Controleer of (x, y) een schip raakt."""
@@ -59,18 +71,23 @@ class ZeeslagGUI:
         return "miss"
 
     def maak_spelbord(self):
-        bord_frame = tk.Frame(self.root)
-        bord_frame.pack(side=tk.LEFT, padx=10, pady=10)
+        # Zorg dat het bord mee kan schalen
+        for i in range(BORD_GROOTTE):
+            self.bord_frame.grid_rowconfigure(i, weight=1)
+            self.bord_frame.grid_columnconfigure(i, weight=1)
 
+        # (Her)bouw knoppen
+        self.knoppen.clear()
         for rij in range(BORD_GROOTTE):
             rij_knoppen = []
             for kolom in range(BORD_GROOTTE):
                 knop = tk.Button(
-                    bord_frame,
+                    self.bord_frame,
                     image=self.images["unknown"],
                     command=lambda x=rij, y=kolom: self.schiet_en_update(x, y)
                 )
-                knop.grid(row=rij, column=kolom)
+                # Plaats elke knop in het grid en laat ‘m vullen
+                knop.grid(row=rij, column=kolom, sticky="nsew")
                 rij_knoppen.append(knop)
             self.knoppen.append(rij_knoppen)
 
@@ -99,9 +116,11 @@ class ZeeslagGUI:
     def toon_help(self):
         messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
 
+    def toon_regels(self):
+        messagebox.showinfo("Regels", "leeg")
 
 # -- testfunctie om te kijken naar aanpassingen
-#if __name__ == "__main__":
-#    root = tk.Tk()
-#    app = ZeeslagGUI(root)
-#    root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ZeeslagGUI(root)
+    root.mainloop()
