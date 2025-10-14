@@ -27,13 +27,13 @@ class ZeeslagGUI:
      
         # Laad afbeeldingen
         self.images = {
-            "hit": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit.png")),
-            "miss": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss.png")),
-            "unknown": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_unknown.png"))
+            "hit": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit64.png")),
+            "miss": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png")),
+            "unknown": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_unknown64.png"))
         }
 
         self.knoppen = []
-        self.hits = set()   # houdt bij welke coördinaten zijn geraakt
+        self.hits = set()   # houdt bij welke coördinaten zijn geraakt  
         self.schepen = []
 
          # Rechter kolom: bediening
