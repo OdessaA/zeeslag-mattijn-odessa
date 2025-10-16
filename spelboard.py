@@ -6,13 +6,13 @@ Gemaakt door:   Mattijn Thijert
                 Odessa Al-Dib
 '''
 #---------------------------------------------------------------------------------
-"""De functies `schiet_op` en `toon_help` hebben nog aanpassing nodig"""
+"""Pauze bij beurtwissel en wisselscherm"""
 #---------------------------------------------------------------------------------
 import tkinter as tk
 from tkinter import messagebox
 import os
 from ships import Ship, Patrouilleschip, Slagschip, Onderzeeër, Torpedobootjager, Vliegdekschip
-
+from players import Player
 
 # Grootte van het bord
 BORD_GROOTTE = 10
@@ -22,110 +22,144 @@ IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class ZeeslagGUI:
-    def __init__(self, root, *args, **kwargs):
-
+    def __init__(self, root, *, player1, player2):
         self.root = root
-        self.root.title("Zeeslag")
-     
-        # Laad afbeeldingen
+        self.root.title("Zeeslag (2 spelers)")
+
+        # Spelers (Player objecten)
+        self.p1 = player1
+        self.p2 = player2
+
+        # Namen komen uit de Player
+        self.name_p1 = self.p1.name
+        self.name_p2 = self.p2.name
+
+        # Afbeeldingen
         self.images = {
             "hit": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit64.png")),
             "miss": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png")),
-            "unknown": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_unknown64.png"))
+            "unknown": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_unknown64.png")),
         }
 
-        self.knoppen = []
-        self.hits = set()   # houdt bij welke coördinaten zijn geraakt  
-        self.schepen = []
+        # UI: header + bord (ongewijzigd)
+        header = tk.Frame(self.root); header.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 0))
+        self.turn_label = tk.Label(header, text="", font=("TkDefaultFont", 12, "bold"))
+        self.turn_label.pack(side="left")
 
-         # Rechter kolom: bediening
-        controls = tk.Frame(self.root)
-        controls.grid(row=0, column=1, sticky="n", padx=10, pady=10)
+        rules_btn = tk.Button(header, text="Regels", command=self.toon_regels)
+        rules_btn.pack(side="right", padx=(6, 0))
+        help_btn = tk.Button(header, text="Help", command=self.toon_help)
+        help_btn.pack(side="right")
 
-        # Helpknop
-        help_knop = tk.Button(controls, text="Help", width=10, command=self.toon_help)
-        help_knop.grid(row=0, column=0, padx=10, pady=(0, 10), sticky="e")
+        self.board_frame = tk.Frame(self.root)
+        self.board_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-        # Rules
-        rules_knop = tk.Button(controls, text="Regels", width=10, command=self.toon_regels)
-        rules_knop.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-
-        # Linker kolom: spelbord
-        self.bord_frame = tk.Frame(self.root)
-        self.bord_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-        
-
-        """Debug Error"""
-        ships = kwargs.pop('ships', None)
-        if ships is None and len(args) >= 1 and isinstance(args[0], (list, tuple)):
-            ships = list(args[0])
-
-        self.root = root
-        self.schepen = list(ships) if ships else []
-
-        if not self.schepen:
-            print("no ships found using default values")
-            self.plaats_schepen()
-        self.maak_spelbord()
-
-    def schiet_op(self, x, y):
-        """Controleer of (x, y) een schip raakt."""
-        # Optioneel: voorkomen dat je twee keer op hetzelfde vakje 'schiet'
-        if (x, y) in self.hits:
-            return "miss"  # of raise/geen actie — ik kies hier 'mis' zodat GUI ermee om kan gaan
-
-        self.hits.add((x, y))
-        for schip in self.schepen:
-            if schip.occupies(x, y):
-                if schip.is_sunk(self.hits):
-                    # Optioneel: geef een melding wanneer een schip gezonken is
-                    messagebox.showinfo("Gezonken!", f"{schip.name} is gezonken!")
-                return "hit"
-        return "miss"
-
-    def maak_spelbord(self):
-        # Zorg dat het bord mee kan schalen
         for i in range(BORD_GROOTTE):
-            self.bord_frame.grid_rowconfigure(i, weight=1)
-            self.bord_frame.grid_columnconfigure(i, weight=1)
+            self.board_frame.grid_rowconfigure(i, weight=1)
+            self.board_frame.grid_columnconfigure(i, weight=1)
 
-        # (Her)bouw knoppen
-        self.knoppen.clear()
-        for rij in range(BORD_GROOTTE):
-            rij_knoppen = []
-            for kolom in range(BORD_GROOTTE):
-                knop = tk.Button(
-                    self.bord_frame,
-                    image=self.images["unknown"],
-                    command=lambda x=rij, y=kolom: self.schiet_en_update(x, y)
-                )
-                # Plaats elke knop in het grid en laat ‘m vullen
-                knop.grid(row=rij, column=kolom, sticky="nsew")
-                rij_knoppen.append(knop)
-            self.knoppen.append(rij_knoppen)
+        self.buttons = []
+        for r in range(BORD_GROOTTE):
+            row_btns = []
+            for c in range(BORD_GROOTTE):
+                b = tk.Button(self.board_frame, image=self.images["unknown"],
+                              command=lambda x=r, y=c: self.klik(x, y))
+                b.grid(row=r, column=c, sticky="nsew")
+                row_btns.append(b)
+            self.buttons.append(row_btns)
 
-    def schiet_en_update(self, x, y):
-        resultaat = self.schiet_op(x, y)
-        knop = self.knoppen[x][y]
-        
-        #Deactiveer de knop
-        knop.config(image=self.images[resultaat], state="disabled")
+        # Start met speler 1
+        self.current = 1
+        self._refresh_view()
 
-    
-    def plaats_schepen(self):
-        """Plaats de schepen op het bord (voorlopig vast)."""
-        
-        schip1 = Patrouilleschip()
-        schip1.set_coordinates([(0, 0), (0, 1)])
 
-        schip2 = Onderzeeër()
-        schip2.set_coordinates([(2, 3), (3, 3), (4, 3)])
+    # ---- helpers ----
+    def _current_player(self):
+        return self.p1 if self.current == 1 else self.p2
 
-        schip3 = Slagschip()
-        schip3.set_coordinates([(6, 6), (6, 7), (6, 8), (6, 9)])
+    def _opponent_player(self):
+        return self.p2 if self.current == 1 else self.p1
 
-        self.schepen = [schip1, schip2, schip3]
+    def _current_name(self):
+        return self._current_player().name
 
+    def _opponent_name(self):
+        return self._opponent_player().name
+
+    def _refresh_view(self):
+        self.root.title(f"{self._current_name()}: Schiet een schot")
+        self.turn_label.config(text=f"Beurt: {self._current_name()} — schiet op {self._opponent_name()}")
+
+        shooter = self._current_player()
+        tried = shooter.tried
+        # ‘Hit’ voor de schutter = schoten die raak waren; die info kun je afleiden:
+        hits = shooter.tried & self._opponent_player().hits  # doorsnede: wat ik probeerde en wat echt raak was
+
+        for r in range(BORD_GROOTTE):
+            for c in range(BORD_GROOTTE):
+                btn = self.buttons[r][c]
+                if (r, c) not in tried:
+                    btn.config(image=self.images["unknown"], state="normal")
+                else:
+                    state = "hit" if (r, c) in hits else "miss"
+                    btn.config(image=self.images[state], state="disabled")
+
+    def _set_board_enabled(self, enabled: bool):
+        state = "normal" if enabled else "disabled"
+        for r in range(BORD_GROOTTE):
+            for c in range(BORD_GROOTTE):
+                # laat reeds geschoten vakjes disabled blijven
+                if self.buttons[r][c]["state"] == "disabled" and enabled:
+                    continue
+                self.buttons[r][c].config(state=state)
+
+    def _switch_turn(self):
+        self.current = 2 if self.current == 1 else 1
+        self._refresh_view()
+        self._set_board_enabled(True)
+
+    # ---- interactie ----
+    def klik(self, r, c):
+        shooter = self._current_player()
+        target  = self._opponent_player()
+
+        if (r, c) in shooter.tried:
+            return
+
+        shooter.tried.add((r, c))              # schutter heeft hier geschoten
+        resultaat = target.ontvang_aanval((r, c))  # doelwit verwerkt de kogel: zet hits/misses bij target
+
+        # Update tegel direct:
+        is_hit = (resultaat != "Mis!")
+        btn = self.buttons[r][c]
+        btn.config(image=self.images["hit" if is_hit else "miss"], state="disabled")
+
+        # Meldingen bij ‘Gezonken!’
+        if resultaat.startswith("Gezonken!"):
+            messagebox.showinfo("Gezonken!", f"{resultaat} van {self._opponent_name()}")
+
+        # Wincheck bij target:
+        if target.alle_schepen_gezonken():
+            messagebox.showinfo("Einde spel", f"{shooter.name} heeft gewonnen!")
+            for rr in range(BORD_GROOTTE):
+                for cc in range(BORD_GROOTTE):
+                    self.buttons[rr][cc].config(state="disabled")
+            return
+       
+        # --- 5s pauze vóór wisselen ---
+        self._set_board_enabled(False)  # voorkom dubbel klikken tijdens de pauze
+        self.turn_label.config(
+            text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'} — wisselt over 5s"
+        )
+        # Plan de wissel over 5000 ms, zonder GUI vast te laten lopen
+        self.root.after(5000, self._switch_turn) # time.sleep zou de GUI vast laten lopen en dan mogelijk niet meer kunnen laten doorstarten
+
+        # beurt wisselen
+        self.current = 2 if self.current == 1 else 1
+        self._refresh_view()
+
+
+    # -------- Info --------
     def toon_help(self):
         messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
 
@@ -135,5 +169,5 @@ class ZeeslagGUI:
 # -- testfunctie om te kijken naar aanpassingen
 if __name__ == "__main__":
     root = tk.Tk()
-    app = ZeeslagGUI(root)
+    app = ZeeslagGUI(root, player1=Player("P1", []), player2=Player("P2", []))
     root.mainloop()

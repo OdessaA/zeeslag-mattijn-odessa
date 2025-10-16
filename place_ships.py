@@ -11,6 +11,7 @@ Gemaakt door:   Mattijn Thijert
 import tkinter as tk
 from tkinter import messagebox
 from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vliegdekschip
+from players import Player 
 import os
 from spelboard import ZeeslagGUI 
 from string import ascii_uppercase # Dit is een module die de standaard waarde van alfabet heeft, en is soms wel handig als je niet het hele ding wilt uit typen
@@ -165,7 +166,7 @@ class PlaatsingsUI(tk.Frame):
         self.master.title("Zeeslag – Speler 1: Plaats je vloot") # Zet een tweede Titel bovenaan het programma 
 
 
-    # ---------- helpers ----------
+    # ---------- helpers ----------                                                                                                                                                                                                                                                             help mij ook, moet dit niet doen om half 2
     """Dit zijn functies die zorgen dat __init__ kan werken"""
     # Deze functie zorgt dat je maar 1 schip van elk soort kunt plaatsen
     def _selecteer_schip(self, sleutel):
@@ -324,12 +325,13 @@ class PlaatsingsUI(tk.Frame):
 
         # Speler 2 klaar → start het spel
         vloot_speler2 = vloot
-        top = tk.Toplevel(self.master)  # Zet het venster bovenop al je andere vensters
+        top = tk.Toplevel(self.master) # Zet het venster bovenop al je andere vensters
         top.title("Zeeslag (2 spelers)")
 
-        # Gebruik de nieuwe 2-spelers GUI:
-        from spelboard import Zeeslag2GUI   # Importeer het spelbord om de boten te kunnen exporteren
-        self.game = Zeeslag2GUI(top, ships_p1=self.vloot_speler1, ships_p2=vloot_speler2)
+        p1 = Player("Speler 1", self.vloot_speler1)
+        p2 = Player("Speler 2", vloot_speler2)
+
+        self.game = ZeeslagGUI(top, player1=p1, player2=p2)
         self.master.withdraw() # Sluit het place_ships tkinter interactive pannel (GUI)
 
 
