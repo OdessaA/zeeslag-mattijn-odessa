@@ -11,7 +11,7 @@ Gemaakt door:   Mattijn Thijert
 import tkinter as tk
 from tkinter import messagebox
 from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vliegdekschip
-import os, importlib.util, inspect, traceback
+import os
 from spelboard import ZeeslagGUI
 
 #--------------------------------------------------------------------------------------------------
@@ -22,9 +22,9 @@ BORD_PIXELS = BORD_GROOTTE * CEL_GROOTTE
 
 SCHEEPS_SPEC = [
     ("Vliegdekschip",   Vliegdekschip,    5, "#4c1d95"),
-    ("Slagschip",       Slagschip,        4, "#c14a09"),
+    ("Slagschip",       Slagschip,        4, "#B91C1C"),
     ("Onderzeeër",      Onderzeeër,       3, "#374151"),
-    ("Torpedojager",    Torpedobootjager, 3, "#B91C1C"),
+    ("Torpedojager",    Torpedobootjager, 3, "#c14a09"),
     ("Patrouilleschip", Patrouilleschip,  2, "#59a14f"),
 ]
 
@@ -49,7 +49,7 @@ class PlaatsingsUI(tk.Frame):
             for naam, cls, lengte, kleur in SCHEEPS_SPEC
         }
 
-        # assets (zorg dat IMG_PAD en CEL_GROOTTE kloppen; bij voorkeur CEL_GROOTTE=64)
+        
         self.img_unknown = tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png"))
         self._tile_images = []  # optioneel; self.img_unknown vasthouden is in principe genoeg
 
@@ -77,17 +77,16 @@ class PlaatsingsUI(tk.Frame):
         actiebalk = tk.Frame(paneel_links); actiebalk.pack(fill="x", pady=(8, 0))
 
         links = tk.Frame(actiebalk); links.pack(side="left")
-        # Wisknop
-        tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
         
-        # Helpknop
+        # Knoppen
+        tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
         tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0))
 
-        tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")  # spacer
+        tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
         self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel)
         self.start_knop.pack(side="right")
 
-        # bord (tegelafbeeldingen i.p.v. witte achtergrond)
+        # bord met tekening
         self.canvas = tk.Canvas(paneel_rechts, width=BORD_PIXELS, height=BORD_PIXELS, highlightthickness=0)
         self.canvas.pack()
 
@@ -236,10 +235,6 @@ class PlaatsingsUI(tk.Frame):
 
         # (pas na succesvol aanmaken verbergen we de plaats-UI)
         self.master.withdraw()
-
-
-
-
 
     def toon_help(self):
         messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
