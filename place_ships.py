@@ -6,14 +6,14 @@ Gemaakt door:   Mattijn Thijert
                 Odessa Al-Dib
 '''
 #---------------------------------------------------------------------------------
-"""n.v.t"""
+"""Tkinter uitleg toevoegen en 2 borden doorsturen naar spelboard"""
 #---------------------------------------------------------------------------------
 import tkinter as tk
 from tkinter import messagebox
 from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vliegdekschip
 import os
-from spelboard import ZeeslagGUI
-
+from spelboard import ZeeslagGUI 
+from string import ascii_uppercase # Dit is een module die de standaard waarde van alfabet heeft, en is soms wel handig als je niet het hele ding wilt uit typen
 #--------------------------------------------------------------------------------------------------
 
 BORD_GROOTTE = 10
@@ -28,18 +28,18 @@ SCHEEPS_SPEC = [
     ("Patrouilleschip", Patrouilleschip,  2, "#59a14f"),
 ]
 
-# maak een toegang tot de map met de pixelarts
+# Maakt de route duidelijk tot de map met de pixelarts
 IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class PlaatsingsUI(tk.Frame):
     def __init__(self, master):
-        super().__init__(master); self.grid(sticky="nsew")
-        master.title("Zeeslag – Plaats je vloot")
+        super().__init__(master); self.grid(sticky="nsew")  # geef alle toestemmingen aan self.grid
+        master.title("Zeeslag – Plaats je vloot") # Zet een titel bovenaan de window, word ietsjes later over writen
 
-        # status
-        self.orientatie = tk.StringVar(value="H")     # "H" of "V"
-        self.geselecteerde_sleutel = None             # key van gekozen schip
+        # Basic Values instellen voor het plaatsen van schepen
+        self.orientatie = tk.StringVar(value="H")     # "H" (horizontaal) of "V" (verticaal)
+        self.geselecteerde_sleutel = None             # key van gekozen schip (unieke waarde)
         self.bezet = [[None]*BORD_GROOTTE for _ in range(BORD_GROOTTE)]  # raster met keys of None
 
         # schepen: sleutel -> dict
@@ -49,86 +49,125 @@ class PlaatsingsUI(tk.Frame):
             for naam, cls, lengte, kleur in SCHEEPS_SPEC
         }
 
-        
+        # Foto voor achtergrond kiezen
         self.img_unknown = tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png"))
-        self._tile_images = []  # optioneel; self.img_unknown vasthouden is in principe genoeg
+        self._tile_images = []  # zet de foto in een list om hem altijd op de juiste manier aan te kunnen roepen en als nodig te kunnen up of downscalen, kan ook zonder een list maar met meer dan 1 foto is een list altijd makkelijker
 
-        # layout
+        # layout van het bord zonder knoppen of functies 
         paneel_links  = tk.Frame(self); paneel_links.grid(row=0, column=0, padx=8, pady=8, sticky="ns")
         paneel_rechts = tk.Frame(self); paneel_rechts.grid(row=0, column=1, padx=8, pady=8, sticky="nsew")
 
-        # palet
+        # voeg de knoppen toe om een schip te kiezen dat je op het bord wilt zetten op basis van zijn unieke waarde
         palet = tk.LabelFrame(paneel_links, text="Kies een schip en klik op het bord"); palet.pack(fill="x")
         for sleutel, schip in self.schepen.items():
             schip["knop"] = tk.Button(
                 palet, text=f"{schip['naam']} ({schip['lengte']})",
-                bg=schip["kleur"], fg="white", activebackground={ "activebackground": schip["kleur"] }.get("activebackground", schip["kleur"]),
+                bg=schip["kleur"], fg="white", activebackground={ "activebackground": schip["kleur"] }.get("activebackground", schip["kleur"]), # zet een kleur voor de achtergrond van de knop
                 command=lambda s=sleutel: self._selecteer_schip(s)
             )
             schip["knop"].pack(fill="x", pady=3)
 
-        # oriëntatie
+        # Maakt het keuzemenu om te kiezen welke oriëntatie het schip heeft
         orbox = tk.LabelFrame(paneel_links, text="Oriëntatie"); orbox.pack(fill="x", pady=(6,0))
         tk.Radiobutton(orbox, text="Horizontaal", variable=self.orientatie, value="H").grid(row=0, column=0, padx=6, pady=4, sticky="w")
         tk.Radiobutton(orbox, text="Verticaal",   variable=self.orientatie, value="V").grid(row=0, column=1, padx=6, pady=4, sticky="w")
         tk.Label(orbox, text="Tip: druk 'r' om te roteren", fg="#666").grid(row=1, column=0, columnspan=2, padx=6, sticky="w")
 
-        # actiebalk (links)
+        # Zorg ervoor dat de knoppen Help, Start en Reset naast elkaar kunnen
         actiebalk = tk.Frame(paneel_links); actiebalk.pack(fill="x", pady=(8, 0))
-
-        links = tk.Frame(actiebalk); links.pack(side="left")
+        links = tk.Frame(actiebalk); links.pack(side="left") # Om het makkelijk te houden is alles voor Links onder "links" gezet
         
         # Knoppen
+        # Maakt een knop die alle schepen van het bord kan halen met behulp van de functie: "_reset_alle_schepen"
         tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
-        tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0))
-
+        # Maakt een hulp knop en zet deze onder de knop van reset
+        tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
+        # Maakt een start knop om de boten door te sturen naar het spelbord
         tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
-        self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel)
-        self.start_knop.pack(side="right")
+        self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel) # De disabeld komt omdat uit nature hij uit staat tot de waarde in "_update_start_knop" is uitgevoerd, waarna het de waarde enabled(default) krijgt
+        self.start_knop.pack(side="right") # Deze heeft er ook de waarde right bij waardoor hij dus rechts van de linker knoppen komt
 
-        # bord met tekening
-        self.canvas = tk.Canvas(paneel_rechts, width=BORD_PIXELS, height=BORD_PIXELS, highlightthickness=0)
-        self.canvas.pack()
+        # --- WRAPPER om labels + canvas te kunnen combineren ---
+        board_wrapper = tk.Frame(paneel_rechts)
+        board_wrapper.pack()  # buitenste container mag 'pack' houden
+
+        # Geef het grid (denk aan een excel tabel maar dan voor knoppen) regels om zich aan te houden om niet oneindig groot te worden
+        board_wrapper.grid_rowconfigure(0, weight=0)    # Dingen met een weight van 0 zullen dus niet meetellen
+        board_wrapper.grid_columnconfigure(0, weight=0)
+        for r in range(1, BORD_GROOTTE + 1):
+            board_wrapper.grid_rowconfigure(r, weight=1, minsize=CEL_GROOTTE)   # Dingen met een weight van 1 daartegen wel, en de minsize is de minimale groote van de cel wat dus gelijk staat aan de celgroote van de PNG
+        for c in range(1, BORD_GROOTTE + 1):
+            board_wrapper.grid_columnconfigure(c, weight=1, minsize=CEL_GROOTTE)
+
+        # Maakt een opvul kolom om te zorgen dat de de tekst niet overlapt met de al bestaande grit en de hoeken van het scherm
+        tk.Label(board_wrapper, text="").grid(row=0, column=0, padx=0, pady=0)
+
+        # Maakt in de bovenste kolomlabels A - J
+        for c in range(BORD_GROOTTE):
+            tk.Label(
+                board_wrapper, text=ascii_uppercase[c], # Dit is dus simpel gezeht neem de eerste 10 stappen uit het alfabet in het lettertype TKDefaultFont en Maakt het bolt
+                font=("TkDefaultFont", 10, "bold")
+            ).grid(row=0, column=c+1, padx=2, pady=(0, 4), sticky="n") # Door sticky te gebruiken staan ze vast aan de knop (klikvakje) wat eronde zit, de rest is om de groote en locatie te bepalen van de cordinaten waar in de grit het beland
+
+        # Maakt in de linker rijlabels 1 - 10
+        for r in range(BORD_GROOTTE):
+            tk.Label(
+                board_wrapper, text=str(r+1), # Hier doe je precies hetzelfde maar dan met een getal wat je elke keer +1 doet tot er geen rijen meer zijn in het speelveld
+                font=("TkDefaultFont", 10, "bold")
+            ).grid(row=r+1, column=0, padx=(0, 6), pady=2, sticky="e")
+
+        # Maakt een canvas (je kunt het zien als een vierkante shape in excel) over je klikknoppen heen om ze als "1" vak te kunnen behanden in opmaak
+        self.canvas = tk.Canvas(
+            board_wrapper,
+            width=BORD_PIXELS, height=BORD_PIXELS,
+            highlightthickness=0
+        )
+        self.canvas.grid(       # geef het canvas een grit om nieuwe knoppen op te zetten 
+            row=1, column=1,
+            rowspan=BORD_GROOTTE, columnspan=BORD_GROOTTE,
+            sticky="nsew"   # Als je sticky op nsew zet kan de grote van de cel meeschalen aan de grote van jou gritruimte waardoor hij altijg zo groot mogelijk probeerd te zijn binnen zijn toegestaande regels
+        )
 
         # Leg per cel een tegel neer + dun grid erbovenop
-        self.cell_items = {}  # (r,c) -> canvas item id van de tegel
+        self.cell_items = {}  # Maakt een list om uiteindelijk makkelijk de klikknoppen in te kunnen zetten, en te kunnen wijzigen
         for r in range(BORD_GROOTTE):
             for c in range(BORD_GROOTTE):
                 x0 = c * CEL_GROOTTE
                 y0 = r * CEL_GROOTTE
 
-                # tegel als onderlaag
+                # Voeg de PNG toe als opvulling van de klikknop
                 img_id = self.canvas.create_image(
-                    x0, y0,
+                    x0, y0, # Cordinaten om bij te houden waar de knop/tegel zit
                     image=self.img_unknown,
-                    anchor="nw",
+                    anchor="nw",    # Met nw (noord-west) lijn je een knop of wat dan ook uit aan de linker bovenkant van een cell
                     tags=("cell", f"r{r}c{c}", "tile"),
                 )
-                self.cell_items[(r, c)] = img_id
+                self.cell_items[(r, c)] = img_id # Voeg de knoppen toe aan de lijst
 
-                # subtiele gridlijn
+                # Maakt een klein dun lijntje tussen alle Cellen die op het canvas worden gezet, is niet nodig, maar staat wel mooier
                 self.canvas.create_rectangle(
-                    x0, y0, x0 + CEL_GROOTTE, y0 + CEL_GROOTTE,
-                    outline="#cccccc", width=1, tags=("grid",)
+                    x0, y0, x0 + CEL_GROOTTE, y0 + CEL_GROOTTE, # cordinaten en lengte
+                    outline="#cccccc", width=1, tags=("grid",) # Kies een kleur en de breete voor het decorative lijntje
                 )
 
-        # zorg dat de tegel onder de grid ligt (netter)
+        # Zorgt ervoor dat de knop netjes op het grid ligt
         self.canvas.tag_lower("tile", "grid")
 
-        # events
-        # Als je de handlers al had, laat dit zo. We rekenen (r,c) uit op basis van muispositie.
-        self.canvas.bind("<Motion>", self._muis_beweging)
-        self.canvas.bind("<Leave>", lambda e: self.canvas.delete("preview"))
-        self.canvas.bind("<Button-1>", self._linker_klik)
-        self.canvas.bind("<Button-3>", self._rechter_klik)
-        master.bind("r", lambda e: self.orientatie.set("V" if self.orientatie.get()=="H" else "H"))
+        # Evenementen (gebeurtenissen)
+        self.canvas.bind("<Motion>", self._muis_beweging) # Elke muisbeweging word bijgehouden om een perfecte preview te kunnen geven
+        self.canvas.bind("<Leave>", lambda e: self.canvas.delete("preview")) # Als je het canvas verlaat (kliktegels) verlaat word de previeuw ook weg gehaald
+        self.canvas.bind("<Button-1>", self._linker_klik) # Houd bij of je op je linker muisknop drukt om een ship te plaatsen
+        self.canvas.bind("<Button-3>", self._rechter_klik)  # Houd bij of je op je rechter muisknop drukt om een schip te verwijderen
+        master.bind("r", lambda e: self.orientatie.set("V" if self.orientatie.get()=="H" else "H")) # Houd  bij of er op "r" word gedrukt om de oriëntatie slider te wisselen van horizontaal naar verticaal of andersom
 
-        self.speler_index = 1
+        self.speler_index = 1   # Houd bij welke speler schepen mag plaatsen
         self.vloot_speler1 = None
-        self.master.title("Zeeslag – Speler 1: Plaats je vloot")
+        self.master.title("Zeeslag – Speler 1: Plaats je vloot") # Zet een tweede Titel bovenaan het programma 
 
 
     # ---------- helpers ----------
+    """Dit zijn functies die zorgen dat __init__ kan werken"""
+    # Deze functie zorgt dat je maar 1 schip van elk soort kunt plaatsen
     def _selecteer_schip(self, sleutel):
         if self.schepen[sleutel]["geplaatst"]:
             return
@@ -136,22 +175,32 @@ class PlaatsingsUI(tk.Frame):
         for k, schip in self.schepen.items():
             schip["knop"].config(relief=("sunken" if k == sleutel else "raised"))
 
+    # Checked of alle spots van het schip binnen het veld vallen
     def _binnen_bord(self, rij, kol): 
         return 0 <= rij < BORD_GROOTTE and 0 <= kol < BORD_GROOTTE
 
+    
     def _voetafdruk(self, rij, kol, lengte, orient):
         return ([(rij, kol+i) for i in range(lengte)] if orient == "H"
                 else [(rij+i, kol) for i in range(lengte)])
 
+    # Checked of alle spots nog vrij zijn en niet of er al een ander schip ligt
     def _plek_vrij(self, coords):
         return all(self._binnen_bord(r, c) and self.bezet[r][c] is None for r, c in coords)
 
+    # Maakt de cellen aan waar schepen geplaatst kunnen worden
     def _teken_cel(self, rij, kol, **kwargs):
         x0, y0 = kol*CEL_GROOTTE+1, rij*CEL_GROOTTE+1
         x1, y1 = x0+CEL_GROOTTE-2, y0+CEL_GROOTTE-2
         return self.canvas.create_rectangle(x0, y0, x1, y1, **kwargs)
 
+    # Geeft tekst aan de helpfunctie knop
+    def toon_help(self):
+        messagebox.showinfo("Help", "Klik op een vakje om te schieten.") # Messagebox geeft je een soort popup in het midden van je scherm met een tekst erop die je met een X kunt wegdrukken. het heeft heel veel instellingen, maar als je niets meegeeft zal hij het altijd doen
+
     # ---------- interactie ----------
+    """Dit zijn functies die bijhouden wat er gebreurd met de muis of toetsenbord"""
+    # Houd bij waar je muis is tijdens het runnen van de code en maakt de juiste keuzes op wat jij doet
     def _muis_beweging(self, e):
         self.canvas.delete("preview")
         if not self.geselecteerde_sleutel:
@@ -165,6 +214,7 @@ class PlaatsingsUI(tk.Frame):
                 self._teken_cel(r, c, outline=("#2a2" if toegestaan else "#a22"),
                                 width=2, fill="", tags="preview")
 
+    # Kijkt wanneer er op de linker muisknop word gedrukt om een schip te plaatsen, en of die spot wel vrij is, anders doet het niets
     def _linker_klik(self, e):
         if not self.geselecteerde_sleutel:
             messagebox.showinfo("Kies schip", "Selecteer eerst een schip links."); return
@@ -184,6 +234,7 @@ class PlaatsingsUI(tk.Frame):
         self.canvas.delete("preview")
         self._update_start_knop()
 
+    # Kijkt wanneer er op de rechter muisknop word gerukt en of er een schip is en haalt die dan weg
     def _rechter_klik(self, e):
         rij, kol = e.y // CEL_GROOTTE, e.x // CEL_GROOTTE
         if not self._binnen_bord(rij, kol): 
@@ -199,6 +250,7 @@ class PlaatsingsUI(tk.Frame):
         schip["knop"].config(state="normal")
         self._update_start_knop()
 
+    # Haalt alle schepen in 1x van het bord af om makkelijk opnieuw te kunnen beginnen
     def _reset_alle_schepen(self):
         for schip in self.schepen.values():
             schip["coordinaten"] = []
@@ -211,20 +263,47 @@ class PlaatsingsUI(tk.Frame):
         self.canvas.delete("ship"); self.canvas.delete("preview")
         self._update_start_knop()
 
+    # Houd bij welke schepen al geplaatst zijn
     def _alle_geplaatst(self):
         return all(s["geplaatst"] for s in self.schepen.values())
 
+    # houd bij wanneer alle schepen geplaatst zijn en toestemming mag geven om de spelstart knop toegangkelijk te maken
     def _update_start_knop(self):
-        self.start_knop.config(state=("normal" if self._alle_geplaatst() else "disabled"))
+        ready = self._alle_geplaatst()
+        if ready:
+            # Enabled-look
+            self.start_knop.config(
+                state="normal",     # In andere woorden "enabled"
+                bg="#40c470",     # Zet een kleur voor de achtergrond van de knop
+                fg="white",         # Zet een kleur voor de voorgrond van de knop
+                activebackground="#2c8f50",
+                activeforeground="white",
+                cursor="hand2"  # Op het moment dat je de knop aan kunt drukken word het zo leuk klik handje
+            )
+        else:
+            # Disabled-look
+            self.start_knop.config(
+                state="disabled",   # Zorgt dat de knop niet ingedrukt kan worden
+                bg="#f3f4f6",          
+                fg="#f3f4f6",
+                activebackground="#f3f4f6",
+                activeforeground="#f3f4f6",
+                disabledforeground="#f3f4f6",
+                cursor="arrow"  # Hetzelfde pijltje als de rest van het programma
+            )
 
+
+
+    # ---------- Start spel ----------
+    """Checked of alle variabelen goed zijn om door te gaan naar spelboard en of bijde spelers hun vloot hebben ingevuld"""
     def _start_spel(self):
 
     # Check: zijn alle schepen geplaatst?
         if not self._alle_geplaatst():
             messagebox.showinfo("Nog niet klaar", "Plaats eerst alle schepen.")
-            return
+            return  # Zou als het goed is nooit mogen uitgevoerd worden, maar je weet het nooit
 
-        # Vloot bouwen uit huidige UI
+        # Vloot bouwen uit huidige GUI (grid)
         vloot = []
         for schip in self.schepen.values():
             inst = schip["klasse"]()
@@ -236,7 +315,7 @@ class PlaatsingsUI(tk.Frame):
             self.vloot_speler1 = vloot
             self._reset_alle_schepen()
 
-            # Speler 2 boten plaatsen
+            # Laat speler 2 schepen plaatsen
             self.speler_index = 2
             self.master.deiconify()
             self.master.title("Zeeslag – Speler 2: Plaats je vloot")
@@ -245,19 +324,17 @@ class PlaatsingsUI(tk.Frame):
 
         # Speler 2 klaar → start het spel
         vloot_speler2 = vloot
-        top = tk.Toplevel(self.master)
+        top = tk.Toplevel(self.master)  # Zet het venster bovenop al je andere vensters
         top.title("Zeeslag (2 spelers)")
 
         # Gebruik de nieuwe 2-spelers GUI:
-        from spelboard import Zeeslag2GUI
+        from spelboard import Zeeslag2GUI   # Importeer het spelbord om de boten te kunnen exporteren
         self.game = Zeeslag2GUI(top, ships_p1=self.vloot_speler1, ships_p2=vloot_speler2)
-        self.master.withdraw()
+        self.master.withdraw() # Sluit het place_ships tkinter interactive pannel (GUI)
 
 
-    def toon_help(self):
-        messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
 
-
+# Voer een test uit op alleen de code in dit bestand
 if __name__ == "__main__":
     root = tk.Tk()
     PlaatsingsUI(root)
