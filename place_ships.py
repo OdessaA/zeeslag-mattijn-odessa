@@ -21,12 +21,16 @@ CEL_GROOTTE = 64
 BORD_PIXELS = BORD_GROOTTE * CEL_GROOTTE
 
 SCHEEPS_SPEC = [
-    ("Vliegdekschip",   Vliegdekschip,    5, "#4e79a7"),
-    ("Slagschip",       Slagschip,        4, "#f28e2b"),
-    ("Onderzeeër",      Onderzeeër,       3, "#e15759"),
-    ("Torpedojager",    Torpedobootjager, 3, "#76b7b2"),
+    ("Vliegdekschip",   Vliegdekschip,    5, "#4c1d95"),
+    ("Slagschip",       Slagschip,        4, "#c14a09"),
+    ("Onderzeeër",      Onderzeeër,       3, "#374151"),
+    ("Torpedojager",    Torpedobootjager, 3, "#B91C1C"),
     ("Patrouilleschip", Patrouilleschip,  2, "#59a14f"),
 ]
+
+# maak een toegang tot de map met de pixelarts
+IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
+
 
 class PlaatsingsUI(tk.Frame):
     def __init__(self, master):
@@ -41,9 +45,13 @@ class PlaatsingsUI(tk.Frame):
         # schepen: sleutel -> dict
         self.schepen = {
             naam: {"naam": naam, "klasse": cls, "lengte": lengte, "kleur": kleur,
-                   "coordinaten": [], "geplaatst": False, "knop": None}
+                "coordinaten": [], "geplaatst": False, "knop": None}
             for naam, cls, lengte, kleur in SCHEEPS_SPEC
         }
+
+        # assets (zorg dat IMG_PAD en CEL_GROOTTE kloppen; bij voorkeur CEL_GROOTTE=64)
+        self.img_unknown = tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png"))
+        self._tile_images = []  # optioneel; self.img_unknown vasthouden is in principe genoeg
 
         # layout
         paneel_links  = tk.Frame(self); paneel_links.grid(row=0, column=0, padx=8, pady=8, sticky="ns")
@@ -54,7 +62,7 @@ class PlaatsingsUI(tk.Frame):
         for sleutel, schip in self.schepen.items():
             schip["knop"] = tk.Button(
                 palet, text=f"{schip['naam']} ({schip['lengte']})",
-                bg=schip["kleur"], fg="white", activebackground=schip["kleur"],
+                bg=schip["kleur"], fg="white", activebackground={ "activebackground": schip["kleur"] }.get("activebackground", schip["kleur"]),
                 command=lambda s=sleutel: self._selecteer_schip(s)
             )
             schip["knop"].pack(fill="x", pady=3)
@@ -65,41 +73,56 @@ class PlaatsingsUI(tk.Frame):
         tk.Radiobutton(orbox, text="Verticaal",   variable=self.orientatie, value="V").grid(row=0, column=1, padx=6, pady=4, sticky="w")
         tk.Label(orbox, text="Tip: druk 'r' om te roteren", fg="#666").grid(row=1, column=0, columnspan=2, padx=6, sticky="w")
 
-        actiebalk = tk.Frame(paneel_links)
-        actiebalk.pack(fill="x", pady=(8, 0))
+        # actiebalk (links)
+        actiebalk = tk.Frame(paneel_links); actiebalk.pack(fill="x", pady=(8, 0))
 
-        # Linkerkolom voor verticale knoppen
-        links = tk.Frame(actiebalk)
-        links.pack(side="left")
-
-        # Alles Wissen knop
+        links = tk.Frame(actiebalk); links.pack(side="left")
+        # Wisknop
         tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
         
         # Helpknop
         tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0))
 
-        # Spacer duwt de startknop naar rechts
-        tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
-
+        tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")  # spacer
         self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel)
         self.start_knop.pack(side="right")
 
-
-        # bord
-        self.canvas = tk.Canvas(paneel_rechts, width=BORD_PIXELS, height=BORD_PIXELS, bg="white", highlightthickness=0)
+        # bord (tegelafbeeldingen i.p.v. witte achtergrond)
+        self.canvas = tk.Canvas(paneel_rechts, width=BORD_PIXELS, height=BORD_PIXELS, highlightthickness=0)
         self.canvas.pack()
-        for i in range(BORD_GROOTTE + 1):
-            pos = i * CEL_GROOTTE
-            self.canvas.create_line(pos, 0, pos, BORD_PIXELS, fill="#ccc")
-            self.canvas.create_line(0, pos, BORD_PIXELS, pos, fill="#ccc")
+
+        # Leg per cel een tegel neer + dun grid erbovenop
+        self.cell_items = {}  # (r,c) -> canvas item id van de tegel
+        for r in range(BORD_GROOTTE):
+            for c in range(BORD_GROOTTE):
+                x0 = c * CEL_GROOTTE
+                y0 = r * CEL_GROOTTE
+
+                # tegel als onderlaag
+                img_id = self.canvas.create_image(
+                    x0, y0,
+                    image=self.img_unknown,
+                    anchor="nw",
+                    tags=("cell", f"r{r}c{c}", "tile"),
+                )
+                self.cell_items[(r, c)] = img_id
+
+                # subtiele gridlijn
+                self.canvas.create_rectangle(
+                    x0, y0, x0 + CEL_GROOTTE, y0 + CEL_GROOTTE,
+                    outline="#cccccc", width=1, tags=("grid",)
+                )
+
+        # zorg dat de tegel onder de grid ligt (netter)
+        self.canvas.tag_lower("tile", "grid")
 
         # events
+        # Als je de handlers al had, laat dit zo. We rekenen (r,c) uit op basis van muispositie.
         self.canvas.bind("<Motion>", self._muis_beweging)
         self.canvas.bind("<Leave>", lambda e: self.canvas.delete("preview"))
         self.canvas.bind("<Button-1>", self._linker_klik)
         self.canvas.bind("<Button-3>", self._rechter_klik)
         master.bind("r", lambda e: self.orientatie.set("V" if self.orientatie.get()=="H" else "H"))
-
 
     # ---------- helpers ----------
     def _selecteer_schip(self, sleutel):
@@ -191,6 +214,11 @@ class PlaatsingsUI(tk.Frame):
         self.start_knop.config(state=("normal" if self._alle_geplaatst() else "disabled"))
 
     def _start_spel(self):
+        # Check: zijn alle schepen geplaatst?
+        if not self._alle_geplaatst():
+            messagebox.showinfo("Nog niet klaar", "Plaats eerst alle schepen.")
+            return
+
         # Vloot bouwen
         vloot = []
         for schip in self.schepen.values():
@@ -198,37 +226,18 @@ class PlaatsingsUI(tk.Frame):
             inst.set_coordinates(schip["coordinaten"])
             vloot.append(inst)
 
-        # Toon wat we hebben (zou nu in de console moeten verschijnen)
+        # Debug: laat zien wat we doorgeven
         print(">>> VLOOT:", [(s.name, list(s.coordinates)) for s in vloot], flush=True)
 
-        # Verberg plaatsscherm
+        # Maak het spelvenster en bewaar referentie, anders kan het object GC'ed worden
+        top = tk.Toplevel(self.master)
+        top.title("Zeeslag")
+        self.game = ZeeslagGUI(top, ships=vloot)   # <- REFERENTIE BEWAREN!
+
+        # (pas na succesvol aanmaken verbergen we de plaats-UI)
         self.master.withdraw()
 
-        # Extra check: klopt de signature?
-        sig = str(inspect.signature(ZeeslagGUI.__init__))
-        print(">>> ZeeslagGUI.__init__ =", sig, flush=True)
-        print(">>> ZeeslagGUI module    =", ZeeslagGUI.__module__, flush=True)
-        print(">>> spelboard file       =", getattr(spelboard, "__file__", "?"), flush=True)
 
-        try:
-            # Bel met keyword, zoals bedoeld
-            ZeeslagGUI(tk.Toplevel(self.master), ships=vloot)
-        except TypeError as e:
-            # Geef glasheldere melding in GUI + console
-            tb = traceback.format_exc()
-            msg = (
-                "TypeError bij aanroepen van ZeeslagGUI(..., ships=vloot)\n\n"
-                f"Signature hier: __init__{sig}\n"
-                f"Module       : {ZeeslagGUI.__module__}\n"
-                f"Bestand      : {getattr(spelboard, '__file__', '?')}\n\n"
-                f"Fout         : {e}\n\n"
-                "→ Dit gebeurt alleen als er elders in je project óók een ZeeslagGUI bestaat "
-                "zonder 'ships' parameter, of als een andere module wordt geïmporteerd.\n\n"
-                "Traceback:\n" + tb
-            )
-            print(msg, flush=True)
-            messagebox.showerror("Constructor mismatch", msg)
-            return
 
 
 
