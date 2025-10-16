@@ -14,7 +14,7 @@ from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vli
 from spelboard import ZeeslagGUI
 
 BORD_GROOTTE = 10
-CEL_GROOTTE = 36
+CEL_GROOTTE = 64
 BORD_PIXELS = BORD_GROOTTE * CEL_GROOTTE
 
 SCHEEPS_SPEC = [
@@ -57,16 +57,30 @@ class PlaatsingsUI(tk.Frame):
             schip["knop"].pack(fill="x", pady=3)
 
         # oriëntatie
-        orbox = tk.LabelFrame(paneel_links, text="Oriëntatie"); orbox.pack(fill="x", pady=(8,0))
+        orbox = tk.LabelFrame(paneel_links, text="Oriëntatie"); orbox.pack(fill="x", pady=(6,0))
         tk.Radiobutton(orbox, text="Horizontaal", variable=self.orientatie, value="H").grid(row=0, column=0, padx=6, pady=4, sticky="w")
         tk.Radiobutton(orbox, text="Verticaal",   variable=self.orientatie, value="V").grid(row=0, column=1, padx=6, pady=4, sticky="w")
         tk.Label(orbox, text="Tip: druk 'r' om te roteren", fg="#666").grid(row=1, column=0, columnspan=2, padx=6, sticky="w")
 
-        # acties
-        actiebalk = tk.Frame(paneel_links); actiebalk.pack(fill="x", pady=(8,0))
-        tk.Button(actiebalk, text="Alles wissen", command=self._reset_alle_schepen).pack(side="left")
+        actiebalk = tk.Frame(paneel_links)
+        actiebalk.pack(fill="x", pady=(8, 0))
+
+        # Linkerkolom voor verticale knoppen
+        links = tk.Frame(actiebalk)
+        links.pack(side="left")
+
+        # Alles Wissen knop
+        tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
+        
+        # Helpknop
+        tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0))
+
+        # Spacer duwt de startknop naar rechts
+        tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
+
         self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel)
         self.start_knop.pack(side="right")
+
 
         # bord
         self.canvas = tk.Canvas(paneel_rechts, width=BORD_PIXELS, height=BORD_PIXELS, bg="white", highlightthickness=0)
@@ -82,6 +96,7 @@ class PlaatsingsUI(tk.Frame):
         self.canvas.bind("<Button-1>", self._linker_klik)
         self.canvas.bind("<Button-3>", self._rechter_klik)
         master.bind("r", lambda e: self.orientatie.set("V" if self.orientatie.get()=="H" else "H"))
+
 
     # ---------- helpers ----------
     def _selecteer_schip(self, sleutel):
@@ -180,6 +195,10 @@ class PlaatsingsUI(tk.Frame):
             vloot.append(inst)
         self.master.withdraw()
         ZeeslagGUI(tk.Toplevel(self.master), ships=vloot)
+
+    def toon_help(self):
+        messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
