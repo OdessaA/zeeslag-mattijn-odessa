@@ -123,6 +123,11 @@ class PlaatsingsUI(tk.Frame):
         self.canvas.bind("<Button-3>", self._rechter_klik)
         master.bind("r", lambda e: self.orientatie.set("V" if self.orientatie.get()=="H" else "H"))
 
+        self.speler_index = 1
+        self.vloot_speler1 = None
+        self.master.title("Zeeslag – Speler 1: Plaats je vloot")
+
+
     # ---------- helpers ----------
     def _selecteer_schip(self, sleutel):
         if self.schepen[sleutel]["geplaatst"]:
@@ -213,28 +218,41 @@ class PlaatsingsUI(tk.Frame):
         self.start_knop.config(state=("normal" if self._alle_geplaatst() else "disabled"))
 
     def _start_spel(self):
-        # Check: zijn alle schepen geplaatst?
+
+    # Check: zijn alle schepen geplaatst?
         if not self._alle_geplaatst():
             messagebox.showinfo("Nog niet klaar", "Plaats eerst alle schepen.")
             return
 
-        # Vloot bouwen
+        # Vloot bouwen uit huidige UI
         vloot = []
         for schip in self.schepen.values():
             inst = schip["klasse"]()
             inst.set_coordinates(schip["coordinaten"])
             vloot.append(inst)
 
-        # Debug: laat zien wat we doorgeven
-        print(">>> VLOOT:", [(s.name, list(s.coordinates)) for s in vloot], flush=True)
+        if self.speler_index == 1:
+            # Bewaar vloot speler 1 en reset voor speler 2
+            self.vloot_speler1 = vloot
+            self._reset_alle_schepen()
 
-        # Maak het spelvenster en bewaar referentie, anders kan het object GC'ed worden
+            # Speler 2 boten plaatsen
+            self.speler_index = 2
+            self.master.deiconify()
+            self.master.title("Zeeslag – Speler 2: Plaats je vloot")
+            messagebox.showinfo("Speler 2", "Geef nu de muis/PC aan Speler 2 om z’n vloot te plaatsen.")
+            return
+
+        # Speler 2 klaar → start het spel
+        vloot_speler2 = vloot
         top = tk.Toplevel(self.master)
-        top.title("Zeeslag")
-        self.game = ZeeslagGUI(top, ships=vloot)   # <- REFERENTIE BEWAREN!
+        top.title("Zeeslag (2 spelers)")
 
-        # (pas na succesvol aanmaken verbergen we de plaats-UI)
+        # Gebruik de nieuwe 2-spelers GUI:
+        from spelboard import Zeeslag2GUI
+        self.game = Zeeslag2GUI(top, ships_p1=self.vloot_speler1, ships_p2=vloot_speler2)
         self.master.withdraw()
+
 
     def toon_help(self):
         messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
