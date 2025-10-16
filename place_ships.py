@@ -11,7 +11,10 @@ Gemaakt door:   Mattijn Thijert
 import tkinter as tk
 from tkinter import messagebox
 from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vliegdekschip
+import os, importlib.util, inspect, traceback
 from spelboard import ZeeslagGUI
+
+#--------------------------------------------------------------------------------------------------
 
 BORD_GROOTTE = 10
 CEL_GROOTTE = 64
@@ -188,13 +191,46 @@ class PlaatsingsUI(tk.Frame):
         self.start_knop.config(state=("normal" if self._alle_geplaatst() else "disabled"))
 
     def _start_spel(self):
+        # Vloot bouwen
         vloot = []
         for schip in self.schepen.values():
             inst = schip["klasse"]()
             inst.set_coordinates(schip["coordinaten"])
             vloot.append(inst)
+
+        # Toon wat we hebben (zou nu in de console moeten verschijnen)
+        print(">>> VLOOT:", [(s.name, list(s.coordinates)) for s in vloot], flush=True)
+
+        # Verberg plaatsscherm
         self.master.withdraw()
-        ZeeslagGUI(tk.Toplevel(self.master), ships=vloot)
+
+        # Extra check: klopt de signature?
+        sig = str(inspect.signature(ZeeslagGUI.__init__))
+        print(">>> ZeeslagGUI.__init__ =", sig, flush=True)
+        print(">>> ZeeslagGUI module    =", ZeeslagGUI.__module__, flush=True)
+        print(">>> spelboard file       =", getattr(spelboard, "__file__", "?"), flush=True)
+
+        try:
+            # Bel met keyword, zoals bedoeld
+            ZeeslagGUI(tk.Toplevel(self.master), ships=vloot)
+        except TypeError as e:
+            # Geef glasheldere melding in GUI + console
+            tb = traceback.format_exc()
+            msg = (
+                "TypeError bij aanroepen van ZeeslagGUI(..., ships=vloot)\n\n"
+                f"Signature hier: __init__{sig}\n"
+                f"Module       : {ZeeslagGUI.__module__}\n"
+                f"Bestand      : {getattr(spelboard, '__file__', '?')}\n\n"
+                f"Fout         : {e}\n\n"
+                "→ Dit gebeurt alleen als er elders in je project óók een ZeeslagGUI bestaat "
+                "zonder 'ships' parameter, of als een andere module wordt geïmporteerd.\n\n"
+                "Traceback:\n" + tb
+            )
+            print(msg, flush=True)
+            messagebox.showerror("Constructor mismatch", msg)
+            return
+
+
 
     def toon_help(self):
         messagebox.showinfo("Help", "Klik op een vakje om te schieten.")

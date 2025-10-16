@@ -13,6 +13,7 @@ from tkinter import messagebox
 import os
 from ships import Ship, Patrouilleschip, Slagschip, Onderzeeër, Torpedobootjager, Vliegdekschip
 
+
 # Grootte van het bord
 BORD_GROOTTE = 10
 
@@ -21,7 +22,8 @@ IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class ZeeslagGUI:
-    def __init__(self, root):
+    def __init__(self, root, *args, **kwargs):
+
         self.root = root
         self.root.title("Zeeslag")
      
@@ -51,8 +53,19 @@ class ZeeslagGUI:
         # Linker kolom: spelbord
         self.bord_frame = tk.Frame(self.root)
         self.bord_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        
 
-        self.plaats_schepen()
+        """Debug Error"""
+        ships = kwargs.pop('ships', None)
+        if ships is None and len(args) >= 1 and isinstance(args[0], (list, tuple)):
+            ships = list(args[0])
+
+        self.root = root
+        self.schepen = list(ships) if ships else []
+
+        if not self.schepen:
+            print("no ships found using default values")
+            self.plaats_schepen()
         self.maak_spelbord()
 
     def schiet_op(self, x, y):
