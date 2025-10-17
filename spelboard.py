@@ -114,9 +114,47 @@ class ZeeslagGUI:
                 self.buttons[r][c].config(state=state)
 
     def _switch_turn(self):
+        # Wissel speler - odessa
         self.current = 2 if self.current == 1 else 1
-        self._refresh_view()
-        self._set_board_enabled(True)
+        self._set_board_enabled(False)
+
+        # Maak een wisselvenster -odessa
+        wissel_win = tk.Toplevel(self.root)
+        wissel_win.title("Beurtwissel")
+        wissel_win.geometry("300x150")
+        wissel_win.transient(self.root)
+
+        # Bericht in het venster van de beurtwissel -odessa
+        msg = tk.Label(
+            wissel_win,
+            text=f"Beurtwissel!\n\nGeef nu de muis aan {self._current_name()}",
+            font=("TkDefaultFont", 12),
+            justify="center"
+        )
+        msg.pack(expand=True, pady=20)
+
+
+        def doorgaan(): # funtie aangemaakt binnen de switch turn functie, die wordt aangeroepen wanneer iemand op de doorgaan knop drukt -odessa
+            wissel_win.destroy() # sluit het wisselvenster -odessa
+            self._refresh_view()   # ververst het bord voor de nieuwe speler -odessa    
+            self._set_board_enabled(True)   # maakt het bord weer klikbaar voor de nieuwe speler -odessa
+
+        tk.Button(wissel_win, text="Doorgaan", command=doorgaan).pack(pady=5) # knop om door te gaan naar de volgende speler -odessa
+
+        # Centreer het venster
+        wissel_win.update_idletasks() 
+        # zorgt dat Tkinter eerst alle wachttaken uitvoert (bijv. het tekenen van het venster) 
+        # zodat de exacte score en positie bekend zijn voor het centreren -odessa
+        
+        # Bereken x en y voor het in het midden plaatsen van het venster -odessa
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 150 # Positie van het hoofdvenster. 300px breed, dus helft is 150, zodat de popup in het midden komt -odessa
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 75 # huidige breedte en hoogte van het hoofdvenster. 150px hoog, dus helft is 75, zodat de popup in het midden komt -odessa
+        
+        # Plaats de popup op de berekende posities op het scherm -odessa
+        wissel_win.geometry(f"+{x}+{y}") # +x+y betekent: 'zet linkerbovenhoek van het venster op (x,y) coördinaat' -odessa
+        
+        #Zorg dat de focus op het wisselvenster blijft totdat deze gesloten wordt. Spelers kunnen niet op het bord klikken waneer wisselvenster openstaat. -odessa
+        wissel_win.grab_set()
 
     # ---- interactie ----
     def klik(self, r, c):
@@ -146,17 +184,15 @@ class ZeeslagGUI:
                     self.buttons[rr][cc].config(state="disabled")
             return
        
-        # --- 5s pauze vóór wisselen ---
-        self._set_board_enabled(False)  # voorkom dubbel klikken tijdens de pauze
+        # Wissel beurt -odessa
+        self._set_board_enabled(False) # maak bord tijdelijk niet klikbaar, zodat spelers niet meerdere keren snel achter elkaar kunnen klikken. -odessa
         self.turn_label.config(
-            text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'} — wisselt over 5s"
-        )
-        # Plan de wissel over 5000 ms, zonder GUI vast te laten lopen
-        self.root.after(5000, self._switch_turn) # time.sleep zou de GUI vast laten lopen en dan mogelijk niet meer kunnen laten doorstarten
+            text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'}"
+        ) # toon direct resultaat op de turn label of het schot raak of mis was -odessa
 
-        # beurt wisselen
-        self.current = 2 if self.current == 1 else 1
-        self._refresh_view()
+        self.root.update()   # update GUI zodat resultaat zichtbaar is voordat het wisselscherm opent -odessa
+        self._switch_turn()  # start de beurtwissel -odessa
+
 
 
     # -------- Info --------
