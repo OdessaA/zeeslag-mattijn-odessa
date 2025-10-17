@@ -25,7 +25,7 @@ SCHEEPS_SPEC = [
     ("Vliegdekschip",   Vliegdekschip,    5, "#4c1d95"),
     ("Slagschip",       Slagschip,        4, "#B91C1C"),
     ("Onderzeeër",      Onderzeeër,       3, "#374151"),
-    ("Torpedojager",    Torpedobootjager, 3, "#c14a09"),
+    ("Torpedobootjager",    Torpedobootjager, 3, "#c14a09"), # 'Torpedojager' aangepast naar 'Torpedobootjager' -odessa 
     ("Patrouilleschip", Patrouilleschip,  2, "#59a14f"),
 ]
 
@@ -53,6 +53,7 @@ class PlaatsingsUI(tk.Frame):
         # Foto voor achtergrond kiezen
         self.img_unknown = tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png"))
         self._tile_images = []  # zet de foto in een list om hem altijd op de juiste manier aan te kunnen roepen en als nodig te kunnen up of downscalen, kan ook zonder een list maar met meer dan 1 foto is een list altijd makkelijker
+        self._tile_images.append(self.img_unknown) # met append blijven de afbeeldingen in de list staan als we meerdere afbeeldingen willen toevoegen -odessa
 
         # layout van het bord zonder knoppen of functies 
         paneel_links  = tk.Frame(self); paneel_links.grid(row=0, column=0, padx=8, pady=8, sticky="ns")
@@ -197,7 +198,9 @@ class PlaatsingsUI(tk.Frame):
 
     # Geeft tekst aan de helpfunctie knop
     def toon_help(self):
-        messagebox.showinfo("Help", "Klik op een vakje om te schieten.") # Messagebox geeft je een soort popup in het midden van je scherm met een tekst erop die je met een X kunt wegdrukken. het heeft heel veel instellingen, maar als je niets meegeeft zal hij het altijd doen
+        messagebox.showinfo("Help", "Selecteer een schip links en klik op het bord om het te plaatsen.\n"
+                            "Klik met rechts om een schip te verwijderen.\n"
+                            "Druk op 'r' om de oriëntatie (horizontaal/verticaal) te wisselen.") # Helpfunctie tekst geschreven -odessa
 
     # ---------- interactie ----------
     """Dit zijn functies die bijhouden wat er gebreurd met de muis of toetsenbord"""
