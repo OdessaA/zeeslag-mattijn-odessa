@@ -23,7 +23,7 @@ class Player:
         self.misses = set()  # Coordinaten waar de speler miste 
         self.tried = set()   # <- voeg toe: alle geschoten coördinaten (voor UI)
 
-    def set_ships(self, ships):
+    def set_ships(self, ships): # de lijst waar per speler bijgehouden word waar welk schip staat
         self.schepen = list(ships or [])
 
     def ontvang_aanval(self, coord): # Het is precies dezelfde aanval functie, alleen dwe niet meer op ships.py maar op spelboard.py
@@ -35,10 +35,10 @@ class Player:
             if schip.occupies(row, col):
                 self.hits.add(coord)
                 if schip.is_sunk(self.hits):
-                    return f"Gezonken! {schip.name}" # "Gezonken!" als het schip volledig gezonken is. 
-                return "Raak!" # "raak" als er een schip geraakt is maar nog niet gezonken is. 
+                    return f"Gezonken! {schip.name}" # "Gezonken!" als het schip volledig gezonken is en start de messagebox om her de speler te laten weten
+                return "Raak!" # "raak" als er een schip geraakt is maar nog niet gezonken is en verander de img van unknown naar raak
         self.misses.add(coord)
-        return "Mis!" # "Mis" als er geen schip op de plek ligt waar er aangevallen is.
+        return "Mis!" # "Mis" als er geen schip op de plek ligt waar er aangevallen is en stuur dus door dat het vakje van img moet wisselen
 
     def alle_schepen_gezonken(self): # De functie is wat ingekort om de check een stukje makkelijk te maken
         return all(s.is_sunk(self.hits) for s in self.schepen) # check kort en snel of er nog een schip uit de lijst overeindstaat

@@ -6,7 +6,7 @@ Gemaakt door:   Mattijn Thijert
                 Odessa Al-Dib
 '''
 #---------------------------------------------------------------------------------
-"""Tkinter uitleg toevoegen en 2 borden doorsturen naar spelboard"""
+"""Tkinter uitleg toevoegen"""
 #---------------------------------------------------------------------------------
 import tkinter as tk
 from tkinter import messagebox
@@ -218,7 +218,7 @@ class PlaatsingsUI(tk.Frame):
     # Kijkt wanneer er op de linker muisknop word gedrukt om een schip te plaatsen, en of die spot wel vrij is, anders doet het niets
     def _linker_klik(self, e):
         if not self.geselecteerde_sleutel:
-            messagebox.showinfo("Kies schip", "Selecteer eerst een schip links."); return
+            messagebox.showinfo("Kies schip", "Selecteer eerst een schip links in de balk."); return
         rij, kol = e.y // CEL_GROOTTE, e.x // CEL_GROOTTE
         schip = self.schepen[self.geselecteerde_sleutel]
         coords = self._voetafdruk(rij, kol, schip["lengte"], self.orientatie.get())
@@ -232,7 +232,7 @@ class PlaatsingsUI(tk.Frame):
         schip["coordinaten"], schip["geplaatst"] = coords, True
         schip["knop"].config(state="disabled", relief="raised")
         self.geselecteerde_sleutel = None
-        self.canvas.delete("preview")
+        self.canvas.delete("preview") # Haal de preview weg als je een ship geplaatst hebt
         self._update_start_knop()
 
     # Kijkt wanneer er op de rechter muisknop word gerukt en of er een schip is en haalt die dan weg
@@ -241,14 +241,14 @@ class PlaatsingsUI(tk.Frame):
         if not self._binnen_bord(rij, kol): 
             return
         sleutel = self.bezet[rij][kol]
-        if sleutel is None:
+        if sleutel is None: # Er word hier gewerkt met sleutel om te kunnen kijken welk schip het is
             return
         schip = self.schepen[sleutel]
         for r, c in schip["coordinaten"]:
             self.bezet[r][c] = None
         self.canvas.delete(f"schip_{sleutel}")
         schip["coordinaten"], schip["geplaatst"] = [], False
-        schip["knop"].config(state="normal")
+        schip["knop"].config(state="normal")    # Reset de nu lege tegel om er een mogelijk nieuw schip op te kunnen zetten
         self._update_start_knop()
 
     # Haalt alle schepen in 1x van het bord af om makkelijk opnieuw te kunnen beginnen
@@ -262,7 +262,7 @@ class PlaatsingsUI(tk.Frame):
                 self.bezet[r][c] = None
         self.geselecteerde_sleutel = None
         self.canvas.delete("ship"); self.canvas.delete("preview")
-        self._update_start_knop()
+        self._update_start_knop() # Reset ook weer de startknop, anders zou je het spel kunenn starten zonder shepen
 
     # Houd bij welke schepen al geplaatst zijn
     def _alle_geplaatst(self):

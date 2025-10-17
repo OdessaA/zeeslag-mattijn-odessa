@@ -147,6 +147,7 @@ class ZeeslagGUI:
             return
        
         # --- 5s pauze vóór wisselen ---
+        """Deze pauze functie werkt niet helaas"""
         self._set_board_enabled(False)  # voorkom dubbel klikken tijdens de pauze
         self.turn_label.config(
             text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'} — wisselt over 5s"
