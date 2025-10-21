@@ -207,7 +207,7 @@ class PlaatsingsUI(tk.Frame):
     def toon_help(self):
         """Toont een helpbericht met instructies voor het plaatsen van schepen."""
         messagebox.showinfo("Help", "Selecteer een schip links en klik op het bord om het te plaatsen.\n"
-                            "Klik met rechts om een schip te verwijderen.\n"
+                            "Klik met rechts om een schip te verwijderen.\n\n"
                             "Druk op 'r' om de oriëntatie (horizontaal/verticaal) te wisselen.") # Helpfunctie tekst geschreven -odessa
 
     # ---------- interactie ----------
