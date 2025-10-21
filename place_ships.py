@@ -198,6 +198,7 @@ class PlaatsingsUI(tk.Frame):
 
     # Geeft tekst aan de helpfunctie knop
     def toon_help(self):
+        """Toont een helpbericht met instructies voor het plaatsen van schepen."""
         messagebox.showinfo("Help", "Selecteer een schip links en klik op het bord om het te plaatsen.\n"
                             "Klik met rechts om een schip te verwijderen.\n"
                             "Druk op 'r' om de oriëntatie (horizontaal/verticaal) te wisselen.") # Helpfunctie tekst geschreven -odessa
@@ -271,37 +272,43 @@ class PlaatsingsUI(tk.Frame):
     def _alle_geplaatst(self):
         return all(s["geplaatst"] for s in self.schepen.values())
 
+
     # houd bij wanneer alle schepen geplaatst zijn en toestemming mag geven om de spelstart knop toegangkelijk te maken
     def _update_start_knop(self):
+        """Update de status van de startknop op basis van of alle schepen zijn geplaatst."""
         ready = self._alle_geplaatst()
         if ready:
+            # Kies tekst afhankelijk van welke speler bezig is - odessa
+            tekst = "Vloot geplaatst" if self.speler_index == 1 else "Start Zeeslag!"
+
             # Enabled-look
             self.start_knop.config(
-                state="normal",     # In andere woorden "enabled"
-                bg="#40c470",     # Zet een kleur voor de achtergrond van de knop
-                fg="white",         # Zet een kleur voor de voorgrond van de knop
+                state="normal",      # In andere woorden "enabled"
+                bg="#40c470",        # Zet een kleur voor de achtergrond van de knop
+                fg="white",          # Zet een kleur voor de voorgrond van de knop
                 activebackground="#2c8f50",
                 activeforeground="white",
-                cursor="hand2"  # Op het moment dat je de knop aan kunt drukken word het zo leuk klik handje
+                cursor="hand2"       # Op het moment dat je de knop aan kunt drukken word het zo leuk klik handje
             )
+            self.start_knop.config(text=tekst)
+
         else:
             # Disabled-look
             self.start_knop.config(
-                state="disabled",   # Zorgt dat de knop niet ingedrukt kan worden
+                state="disabled",    # Zorgt dat de knop niet ingedrukt kan worden
                 bg="#f3f4f6",          
                 fg="#f3f4f6",
                 activebackground="#f3f4f6",
                 activeforeground="#f3f4f6",
                 disabledforeground="#f3f4f6",
-                cursor="arrow"  # Hetzelfde pijltje als de rest van het programma
+                cursor="arrow"       # Hetzelfde pijltje als de rest van het programma
             )
 
 
-
     # ---------- Start spel ----------
-    """Checked of alle variabelen goed zijn om door te gaan naar spelboard en of bijde spelers hun vloot hebben ingevuld"""
+   
     def _start_spel(self):
-
+        """Checkt of alle variabelen goed zijn om door te gaan naar spelboard en of bijde spelers hun vloot hebben ingevuld"""
     # Check: zijn alle schepen geplaatst?
         if not self._alle_geplaatst():
             messagebox.showinfo("Nog niet klaar", "Plaats eerst alle schepen.")
@@ -323,7 +330,13 @@ class PlaatsingsUI(tk.Frame):
             self.speler_index = 2
             self.master.deiconify()
             self.master.title("Zeeslag – Speler 2: Plaats je vloot")
-            messagebox.showinfo("Speler 2", "Geef nu de muis/PC aan Speler 2 om z’n vloot te plaatsen.")
+
+            messagebox.showinfo(
+                "Speler 1 klaar",
+                "Speler 1 heeft zijn vloot geplaatst.\n\n"
+                "Geef nu de muis of laptop aan Speler 2,\n"
+                "zodat hij zijn vloot kan neerzetten." # Informatieve tekst voor speler 1 dat hij klaar is en speler 2 aan de beurt is -odessa
+            )
             return
 
         # Speler 2 klaar → start het spel

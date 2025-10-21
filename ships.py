@@ -13,7 +13,7 @@ class Ship: # Parent-klasse voor alle schepen.
     """ Parentklasse voor schepen met naam, lengte en coördinaten. """
 
     def __init__(self, length, name="Onbekend"):
-        """ Maakt een schip met opgegeven lengte en naam. """
+        """ Initialiseert een schip met opgegeven lengte en naam. """
         self.name = name
         self.length = length 
         self.coordinates = []

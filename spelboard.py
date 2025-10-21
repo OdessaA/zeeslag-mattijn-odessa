@@ -1,13 +1,12 @@
 #Spelboard.py
 '''
-In dit bestand word het spelbord van de zeeslag, en de graphical GUI bijgehouden
+spelboard.py bevat de GUI en spelbesturing voor Zeeslag.
+Regelt beurtwisseling, schoten en de eindmelding.
 
 Gemaakt door:   Mattijn Thijert
                 Odessa Al-Dib
 '''
-#---------------------------------------------------------------------------------
-"""Pauze bij beurtwissel en wisselscherm"""
-#---------------------------------------------------------------------------------
+
 import tkinter as tk
 from tkinter import messagebox
 import os
@@ -114,6 +113,7 @@ class ZeeslagGUI:
                 self.buttons[r][c].config(state=state)
 
     def _switch_turn(self):
+        """Wissel de huidige speler en toon een wisselvenster."""
         # Wissel speler - odessa
         self.current = 2 if self.current == 1 else 1
         self._set_board_enabled(False)
@@ -135,6 +135,7 @@ class ZeeslagGUI:
 
 
         def doorgaan(): # funtie aangemaakt binnen de switch turn functie, die wordt aangeroepen wanneer iemand op de doorgaan knop drukt -odessa
+            """Sluit het wisselvenster en ververst het bord voor de nieuwe speler."""
             wissel_win.destroy() # sluit het wisselvenster -odessa
             self._refresh_view()   # ververst het bord voor de nieuwe speler -odessa    
             self._set_board_enabled(True)   # maakt het bord weer klikbaar voor de nieuwe speler -odessa
@@ -197,10 +198,28 @@ class ZeeslagGUI:
 
     # -------- Info --------
     def toon_help(self):
-        messagebox.showinfo("Help", "Klik op een vakje om te schieten.")
+        """Toont korte uitleg over de bediening tijdens het spel."""
+        messagebox.showinfo(
+            "Help",
+            "Klik op een vakje om te schieten op het bord van je tegenstander.\n\n"
+            "Je ziet meteen of je schot raak of mis was.\n"
+            "Bij een voltreffer verschijnt 'Gezonken!'.\n\n"
+            "Na elk schot krijgt de andere speler de beurt.\n"
+            "Draai dan het scherm of geef de muis door."
+        )  # Helpvenster geschreven -odessa
 
     def toon_regels(self):
-        messagebox.showinfo("Regels", "leeg")
+        """Toont korte uitleg van de spelregels."""
+        messagebox.showinfo(
+            "Spelregels – Zeeslag",
+            "1. Plaats je vijf schepen op het bord (ze mogen niet overlappen).\n\n"
+            "2. Spelers schieten om de beurt op elkaars bord.\n"
+            "Raak = deel van een schip. Gezonken = hele schip geraakt.\n\n"
+            "3. Na elke beurt wisselen de spelers.\n"
+            "Draai het scherm of geef de muis door.\n\n"
+            "4. Wie als eerste alle schepen van de tegenstander laat zinken, wint!"
+        )  # Regelsvenster geschreven -odessa
+
 
 # -- testfunctie om te kijken naar aanpassingen
 if __name__ == "__main__":

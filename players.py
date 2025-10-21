@@ -7,38 +7,45 @@ Elke speler heeft:
     - Een lijst met schepen.
     - Een verzameling coördinaten van hits en misses.
     
-    Gemaakt door:   Odessa Al-Dib
+    Gemaakt door: Odessa Al-Dib
 
-    kleine aanpassing: Mattijn Thijert
+    Kleine aanpassing: Mattijn Thijert
+
+    Deze class hoort bij het Zeeslag-spel en wordt gebruikt in spelboard.py.
 """
-#---------------------------------------------------------------------------------
-"""n.v.t"""
-#---------------------------------------------------------------------------------
 
 class Player:
+    """Parent klasse voor een speler in het spel."""
     def __init__(self, name, ships=None):
+        """Initialiseer een speler: naam van de speler, lijst met schepen en een verzameling coördinaten van hits en misses."""
         self.name = name
-        self.schepen = list(ships or [])
-        self.hits = set()    # Coordinaten waar de speler geraakt is. (set want dat voorkomt dubbele waardes)
-        self.misses = set()  # Coordinaten waar de speler miste 
-        self.tried = set()   # <- voeg toe: alle geschoten coördinaten (voor UI)
+        self.schepen = list(ships or []) # Lijst van schepen, bijvoorbeeld [Slagschip(), Onderzeeër(), ...]
+        self.hits = set()    # Coördinaten waar deze speler geraakt is door de tegenstander. (set want dat voorkomt dubbele waardes)
+        self.misses = set()  # Coördinaten waar de tegenstander miste bij deze speler.
+        self.tried = set()   # Alle coördinaten waar de speler al op geschoten heeft
 
-    def set_ships(self, ships): # de lijst waar per speler bijgehouden word waar welk schip staat
-        self.schepen = list(ships or [])
+    def set_ships(self, ships):
+        """Stel de schepen van de speler in."""
+        self.schepen = list(ships or []) 
 
-    def ontvang_aanval(self, coord): # Het is precies dezelfde aanval functie, alleen dwe niet meer op ships.py maar op spelboard.py
-        """Verwerk aanval op deze speler (coördinaat is (r,c)).
-           Return: "Raak!", of "Gezonken! <naam>", of "Mis!"
+    def ontvang_aanval(self, coord): 
+        """
+        Verwerkt een aanval op deze speler op de gegeven coördinaat.
+        Returns:
+            - 'Raak!' als een schip geraakt wordt.
+            - 'Gezonken! [scheepsnaam]' als het schip volledig geraakt is.
+            - 'Mis!' als er geen schip op dat vakje ligt.
         """
         row, col = coord
         for schip in self.schepen:
             if schip.occupies(row, col):
                 self.hits.add(coord)
                 if schip.is_sunk(self.hits):
-                    return f"Gezonken! {schip.name}" # "Gezonken!" als het schip volledig gezonken is en start de messagebox om her de speler te laten weten
-                return "Raak!" # "raak" als er een schip geraakt is maar nog niet gezonken is en verander de img van unknown naar raak
+                    return f"Gezonken! {schip.name}" 
+                return "Raak!" 
         self.misses.add(coord)
-        return "Mis!" # "Mis" als er geen schip op de plek ligt waar er aangevallen is en stuur dus door dat het vakje van img moet wisselen
+        return "Mis!" 
 
-    def alle_schepen_gezonken(self): # De functie is wat ingekort om de check een stukje makkelijk te maken
-        return all(s.is_sunk(self.hits) for s in self.schepen) # check kort en snel of er nog een schip uit de lijst overeindstaat
+    def alle_schepen_gezonken(self): 
+        """Controleer of alle schepen van de speler gezonken zijn."""
+        return all(s.is_sunk(self.hits) for s in self.schepen) 
