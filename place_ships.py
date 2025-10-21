@@ -60,7 +60,8 @@ class PlaatsingsUI(tk.Frame):
         paneel_rechts = tk.Frame(self); paneel_rechts.grid(row=0, column=1, padx=8, pady=8, sticky="nsew")
 
         # voeg de knoppen toe om een schip te kiezen dat je op het bord wilt zetten op basis van zijn unieke waarde
-        palet = tk.LabelFrame(paneel_links, text="Kies een schip en klik op het bord"); palet.pack(fill="x")
+        palet = tk.LabelFrame(paneel_links, text="Kies een schip en klik op het bord")
+        palet.pack(fill="x")
         for sleutel, schip in self.schepen.items():
             schip["knop"] = tk.Button(
                 palet, text=f"{schip['naam']} ({schip['lengte']})",
@@ -84,6 +85,7 @@ class PlaatsingsUI(tk.Frame):
         tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
         # Maakt een hulp knop en zet deze onder de knop van reset
         tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
+        
         # Maakt een start knop om de boten door te sturen naar het spelbord
         tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
         self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel) # De disabeld komt omdat uit nature hij uit staat tot de waarde in "_update_start_knop" is uitgevoerd, waarna het de waarde enabled(default) krijgt
@@ -159,7 +161,12 @@ class PlaatsingsUI(tk.Frame):
         self.canvas.bind("<Motion>", self._muis_beweging) # Elke muisbeweging word bijgehouden om een perfecte preview te kunnen geven
         self.canvas.bind("<Leave>", lambda e: self.canvas.delete("preview")) # Als je het canvas verlaat (kliktegels) verlaat word de previeuw ook weg gehaald
         self.canvas.bind("<Button-1>", self._linker_klik) # Houd bij of je op je linker muisknop drukt om een ship te plaatsen
-        self.canvas.bind("<Button-3>", self._rechter_klik)  # Houd bij of je op je rechter muisknop drukt om een schip te verwijderen
+
+        # Rechtsklik functie op alle platformen: Windows/Linux en MacOS -odessa
+        self.canvas.bind("<Button-3>", self._rechter_klik)          # Windows/Linux -odessa 
+        self.canvas.bind("<Button-2>", self._rechter_klik)          # macOS -odessa
+        self.canvas.bind("<Control-Button-1>", self._rechter_klik)  # macOS alternatief voor rechtsklik -odessa
+
         master.bind("r", lambda e: self.orientatie.set("V" if self.orientatie.get()=="H" else "H")) # Houd  bij of er op "r" word gedrukt om de oriëntatie slider te wisselen van horizontaal naar verticaal of andersom
 
         self.speler_index = 1   # Houd bij welke speler schepen mag plaatsen
@@ -267,6 +274,8 @@ class PlaatsingsUI(tk.Frame):
         self.geselecteerde_sleutel = None
         self.canvas.delete("ship"); self.canvas.delete("preview")
         self._update_start_knop() # Reset ook weer de startknop, anders zou je het spel kunenn starten zonder shepen
+        self.update_idletasks() 
+
 
     # Houd bij welke schepen al geplaatst zijn
     def _alle_geplaatst(self):
