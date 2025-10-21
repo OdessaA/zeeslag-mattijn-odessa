@@ -34,9 +34,11 @@ IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class PlaatsingsUI(tk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, speler1_naam="Speler 1", speler2_naam="Speler 2"):
         super().__init__(master); self.grid(sticky="nsew")  # geef alle toestemmingen aan self.grid
-        master.title("Zeeslag – Plaats je vloot") # Zet een titel bovenaan de window, word ietsjes later over writen
+        self.speler1_naam = speler1_naam # Zet de naam van speler 1 in een variabele -odessa
+        self.speler2_naam = speler2_naam # Zet de naam van speler 2 in een variabele -odessa
+        master.title(f"Zeeslag – {self.speler1_naam}: Plaats je vloot") # Zet een titel bovenaan de window, word ietsjes later over writen
 
         # Basic Values instellen voor het plaatsen van schepen
         self.orientatie = tk.StringVar(value="H")     # "H" (horizontaal) of "V" (verticaal)
@@ -171,8 +173,6 @@ class PlaatsingsUI(tk.Frame):
 
         self.speler_index = 1   # Houd bij welke speler schepen mag plaatsen
         self.vloot_speler1 = None
-        self.master.title("Zeeslag – Speler 1: Plaats je vloot") # Zet een tweede Titel bovenaan het programma 
-
 
     # ---------- helpers ----------                                                                                                                                                                                                                                                             help mij ook, moet dit niet doen om half 2
     """Dit zijn functies die zorgen dat __init__ kan werken"""
@@ -338,13 +338,13 @@ class PlaatsingsUI(tk.Frame):
             # Laat speler 2 schepen plaatsen
             self.speler_index = 2
             self.master.deiconify()
-            self.master.title("Zeeslag – Speler 2: Plaats je vloot")
+            self.master.title(f"Zeeslag – {self.speler2_naam}: Plaats je vloot")
 
             messagebox.showinfo(
-                "Speler 1 klaar",
-                "Speler 1 heeft zijn vloot geplaatst.\n\n"
-                "Geef nu de muis of laptop aan Speler 2,\n"
-                "zodat hij zijn vloot kan neerzetten." # Informatieve tekst voor speler 1 dat hij klaar is en speler 2 aan de beurt is -odessa
+                f"{self.speler1_naam} klaar",                               # Aanpassing in de tekst zodat de namen van de spelers worden gebruikt -odessa
+                f"{self.speler1_naam} heeft zijn/haar vloot geplaatst.\n\n"
+                f"Geef nu de muis of laptop aan {self.speler2_naam},\n"
+                f"zodat {self.speler2_naam} zijn/haar vloot kan plaatsen."
             )
             return
 
@@ -353,9 +353,8 @@ class PlaatsingsUI(tk.Frame):
         top = tk.Toplevel(self.master) # Zet het venster bovenop al je andere vensters
         top.title("Zeeslag (2 spelers)")
 
-        p1 = Player("Speler 1", self.vloot_speler1)
-        p2 = Player("Speler 2", vloot_speler2)
-
+        p1 = Player(self.speler1_naam, self.vloot_speler1)# Maak de spelers aan met hun naam (niet meer hardcoded als "speler 1" of "speler 2") -odessa
+        p2 = Player(self.speler2_naam, vloot_speler2)
         self.game = ZeeslagGUI(top, player1=p1, player2=p2)
         self.master.withdraw() # Sluit het place_ships tkinter interactive pannel (GUI)
 
