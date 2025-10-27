@@ -22,7 +22,7 @@ IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class ZeeslagGUI:
-    def __init__(self, root, *, player1, player2):
+    def __init__(self, root, *, player1, player2, shots_per_turn=1):
         self.root = root
         self.root.title("Zeeslag (2 spelers)")
 
@@ -33,6 +33,9 @@ class ZeeslagGUI:
         # Namen komen uit de Player
         self.name_p1 = self.p1.name
         self.name_p2 = self.p2.name
+
+        self.shots_per_turn = max(1, int(shots_per_turn))
+        self.shots_left = self.shots_per_turn
 
         # Afbeeldingen
         self.images = {
@@ -45,6 +48,8 @@ class ZeeslagGUI:
         header = tk.Frame(self.root); header.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 0))
         self.turn_label = tk.Label(header, text="", font=("TkDefaultFont", 12, "bold"))
         self.turn_label.pack(side="left")
+        self.shots_label = tk.Label(header, text="", font=("TkDefaultFont", 10))
+        self.shots_label.pack(side="left", padx=(10,0))
 
         rules_btn = tk.Button(header, text="Regels", command=self.toon_regels)
         rules_btn.pack(side="right", padx=(6, 0))
@@ -89,6 +94,7 @@ class ZeeslagGUI:
     def _refresh_view(self):
         self.root.title(f"{self._current_name()}: Schiet een schot")
         self.turn_label.config(text=f"Beurt: {self._current_name()} — schiet op {self._opponent_name()}")
+        self.shots_label.config(text=f"Schoten resterend: {self.shots_left}") # Toon resterende schoten voor de huidige speler
 
         shooter = self._current_player()
         tried = shooter.tried
@@ -117,6 +123,8 @@ class ZeeslagGUI:
         """Wissel de huidige speler en toon een wisselvenster."""
         # Wissel speler (1 > 2 of 2 > 1) - odessa
         self.current = 2 if self.current == 1 else 1
+        self.shots_left = self.shots_per_turn # Reset schoten voor de volgende speler
+
         self._set_board_enabled(False) # bord tijdelijk uitschakelen tijdens beurtwissel - odessa
 
         # Maak een wisselvenster -odessa
@@ -202,6 +210,15 @@ class ZeeslagGUI:
                     font=("TkDefaultFont", 14, "bold"),
                     pady=10
                 ).pack()
+
+        # Geen winst? Schotteller verlagen en evt. beurt wisselen
+        self.shots_left -= 1
+        if self.shots_left <= 0:
+            self._switch_turn()
+        else:
+            # Zelfde speler schiet nogmaals; update labels en laat bord actief
+            self._refresh_view()
+            self._set_board_enabled(True)
 
             # Toon scores van beide spelers -odessa
             tk.Label(

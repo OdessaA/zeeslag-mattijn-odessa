@@ -40,17 +40,26 @@ class PlaatsingsUI(tk.Frame):
         self.speler2_naam = speler2_naam # Zet de naam van speler 2 in een variabele -odessa
         master.title(f"Zeeslag – {self.speler1_naam}: Plaats je vloot") # Zet een titel bovenaan de window, word ietsjes later over writen
 
+        # ----- Instellingen (defaults) -----
+        # ships_per_player: hoeveel schepen mag/zal elke speler hebben (1..len(SCHEEPS_SPEC))
+        # shots_per_turn:   hoeveel schoten per beurt (1..5)
+        self.settings = getattr(master, "_game_settings", {"ships_per_player": len(SCHEEPS_SPEC), "shots_per_turn": 1})
+
         # Basic Values instellen voor het plaatsen van schepen
         self.orientatie = tk.StringVar(value="H")     # "H" (horizontaal) of "V" (verticaal)
         self.geselecteerde_sleutel = None             # key van gekozen schip (unieke waarde)
         self.bezet = [[None]*BORD_GROOTTE for _ in range(BORD_GROOTTE)]  # raster met keys of None
 
+        
+        # Activeer alleen de eerste N schepen volgens instelling
+        actieve_spec = SCHEEPS_SPEC[: self.settings["ships_per_player"]]
         # schepen: sleutel -> dict
         self.schepen = {
             naam: {"naam": naam, "klasse": cls, "lengte": lengte, "kleur": kleur,
-                "coordinaten": [], "geplaatst": False, "knop": None}
-            for naam, cls, lengte, kleur in SCHEEPS_SPEC
+                   "coordinaten": [], "geplaatst": False, "knop": None}
+            for naam, cls, lengte, kleur in actieve_spec
         }
+
 
         # Foto voor achtergrond kiezen
         self.img_unknown = tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_miss64.png"))
@@ -87,7 +96,9 @@ class PlaatsingsUI(tk.Frame):
         tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
         # Maakt een hulp knop en zet deze onder de knop van reset
         tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
-        
+        # Instellingen-knop 
+        tk.Button(links, text="⚙ Instellingen", command=self._open_instellingen).pack(anchor="w", pady=(6, 0))
+
         # Maakt een start knop om de boten door te sturen naar het spelbord
         tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
         self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel) # De disabeld komt omdat uit nature hij uit staat tot de waarde in "_update_start_knop" is uitgevoerd, waarna het de waarde enabled(default) krijgt
@@ -314,6 +325,70 @@ class PlaatsingsUI(tk.Frame):
             )
 
 
+    def _herstart_met_settings(self, ships_per_player, shots_per_turn):
+        """Sla de aangepaste settings aan, en start een nieuw spel op met die settings"""
+        from tkinter import messagebox
+        # Waarschuwing als er al plaatsingen zijn
+        if any(s["geplaatst"] for s in self.schepen.values()):
+            if not messagebox.askyesno("Let op", "Instellingen wijzigen reset je huidige plaatsing. Doorgaan?"):
+                return
+
+        # Sla settings op aan het master-venster zodat ze behouden blijven
+        setattr(self.master, "_game_settings", {
+            "ships_per_player": int(ships_per_player),
+            "shots_per_turn": int(shots_per_turn),
+        })
+
+        # Rebuild UI met dezelfde spelersnamen
+        master = self.master
+        speler1, speler2 = self.speler1_naam, self.speler2_naam
+        for w in master.winfo_children():
+            w.destroy()
+        PlaatsingsUI(master, speler1, speler2)
+
+
+    def _open_instellingen(self):
+        """Dialoog: aantal schepen per speler en schoten per beurt."""
+        win = tk.Toplevel(self.master)
+        win.title("Instellingen")
+        win.transient(self.master)
+        win.resizable(False, False)
+
+        # Huidige waarden
+        ships_var = tk.IntVar(value=self.settings["ships_per_player"])
+        shots_var = tk.IntVar(value=self.settings["shots_per_turn"])
+
+        frm = tk.Frame(win, padx=12, pady=12); frm.pack(fill="both", expand=True)
+
+        # Aantal schepen per speler
+        tk.Label(frm, text=f"Aantal schepen per speler (1–{len(SCHEEPS_SPEC)}):").grid(row=0, column=0, sticky="w")
+        tk.Spinbox(frm, from_=1, to=len(SCHEEPS_SPEC), textvariable=ships_var, width=5)\
+            .grid(row=0, column=1, sticky="w", padx=(8,0))
+
+        # Schoten per beurt
+        tk.Label(frm, text="Schoten per beurt (1–5):").grid(row=1, column=0, sticky="w", pady=(6,0))
+        tk.Spinbox(frm, from_=1, to=5, textvariable=shots_var, width=5)\
+            .grid(row=1, column=1, sticky="w", padx=(8,0), pady=(6,0))
+
+        tk.Label(frm, text="Wijzigen reset het plaats-scherm.", fg="#a00")\
+            .grid(row=2, column=0, columnspan=2, sticky="w", pady=(10,0))
+
+        # Buttons
+        btns = tk.Frame(frm); btns.grid(row=3, column=0, columnspan=2, sticky="e", pady=(10,0))
+        tk.Button(btns, text="Annuleren", command=win.destroy).pack(side="left", padx=(0,6))
+        def toepassen():
+            win.destroy()
+            self._herstart_met_settings(ships_var.get(), shots_var.get())
+        tk.Button(btns, text="Toepassen", command=toepassen).pack(side="left")
+
+        # Positioneer linksonder van hoofdvenster
+        self.master.update_idletasks()
+        x = self.master.winfo_x() + 16
+        y = self.master.winfo_y() + self.master.winfo_height() - 260
+        win.geometry(f"+{x}+{y}")
+        win.grab_set()
+
+
     # ---------- Start spel ----------
    
     def _start_spel(self):
@@ -355,7 +430,9 @@ class PlaatsingsUI(tk.Frame):
 
         p1 = Player(self.speler1_naam, self.vloot_speler1)# Maak de spelers aan met hun naam (niet meer hardcoded als "speler 1" of "speler 2") -odessa
         p2 = Player(self.speler2_naam, vloot_speler2)
-        self.game = ZeeslagGUI(top, player1=p1, player2=p2)
+        spt = getattr(self.master, "_game_settings", {}).get("shots_per_turn", 1) # shots_per_turn doorgeven aan het spelbord
+        self.game = ZeeslagGUI(top, player1=p1, player2=p2, shots_per_turn=int(spt))
+
         self.master.withdraw() # Sluit het place_ships tkinter interactive pannel (GUI)
 
 
