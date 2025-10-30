@@ -218,7 +218,6 @@ class ZeeslagGUI:
             treffers_sp2 = len(self.p2.tried & self.p1.hits) # schoten van speler 2 die raak waren -odessa
             missers_sp2 = len(self.p2.tried) - treffers_sp2 # overige schoten waren mis -odessa
 
-
             # Toon eindscherm met scores
             eind_venster = tk.Toplevel(self.root)
             eind_venster.title("Einde spel")
@@ -233,15 +232,6 @@ class ZeeslagGUI:
                     font=("TkDefaultFont", 14, "bold"),
                     pady=10
                 ).pack()
-
-            # Geen winst? Schotteller verlagen en evt. beurt wisselen
-            self.shots_left -= 1
-            if self.shots_left <= 0:
-                self._switch_turn()
-            else:
-                # Zelfde speler schiet nogmaals; update labels en laat bord actief
-                self._refresh_view()
-                self._set_board_enabled(True)
 
             # Toon scores van beide spelers -odessa
             tk.Label(
@@ -276,7 +266,9 @@ class ZeeslagGUI:
             for rr in range(BORD_GROOTTE):
                 for cc in range(BORD_GROOTTE):
                     self.buttons[rr][cc].config(state="disabled")
-            return
+
+            return  # <<< BELANGRIJK! stop hier, zodat er geen beurtwissel meer volgt
+
        
         # Wissel beurt -odessa
         self._set_board_enabled(False) # maak bord tijdelijk niet klikbaar, zodat spelers niet meerdere keren snel achter elkaar kunnen klikken. -odessa
