@@ -93,11 +93,11 @@ class PlaatsingsUI(tk.Frame):
         
         # Knoppen
         # Maakt een knop die alle schepen van het bord kan halen met behulp van de functie: "_reset_alle_schepen"
-        tk.Button(links, text="Alles wissen", width=12, command=self._reset_alle_schepen).pack(anchor="w") # width is de grote van de knop
+        tk.Button(links, text="🗷 Alles wissen", width=12, command=self._reset_alle_schepen).pack(anchor="w") # width is de grote van de knop
         # Maakt een hulp knop en zet deze onder de knop van reset
-        tk.Button(links, text="Help", width=12, command=self.toon_help).pack(anchor="w", pady=(4, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
+        tk.Button(links, text="🛈       Help       ", width=12, command=self.toon_help).pack(anchor="w", pady=(8, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
         # Instellingen-knop 
-        tk.Button(links, text="⚙ Instellingen", command=self._open_instellingen).pack(anchor="w", pady=(8, 0))
+        tk.Button(links, text="⚙ Instellingen ", width= 12, command=self._open_instellingen).pack(anchor="w", pady=(8, 0))
 
         # Maakt een start knop om de boten door te sturen naar het spelbord
         tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")

@@ -34,7 +34,10 @@ class ZeeslagGUI:
         self.name_p1 = self.p1.name
         self.name_p2 = self.p2.name
 
-        self.shots_per_turn = max(1, int(shots_per_turn))
+        # Lees shots_per_turn uit master._game_settings (als aanwezig)
+        settings = getattr(root, "_game_settings", {}) or {}
+        cfg_shots = settings.get("shots_per_turn", shots_per_turn)
+        self.shots_per_turn = max(1, int(cfg_shots))
         self.shots_left = self.shots_per_turn
 
         # Afbeeldingen
@@ -269,13 +272,35 @@ class ZeeslagGUI:
 
             return  # <<< BELANGRIJK! stop hier, zodat er geen beurtwissel meer volgt
 
-       
+        ''' De oude functie
         # Wissel beurt -odessa
         self._set_board_enabled(False) # maak bord tijdelijk niet klikbaar, zodat spelers niet meerdere keren snel achter elkaar kunnen klikken. -odessa
         self.turn_label.config(
             text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'}"
         ) # toon direct resultaat op de turn label of het schot raak of mis was -odessa
 
+        self.root.update()   # update GUI zodat resultaat zichtbaar is voordat het wisselscherm opent -odessa
+        self._switch_turn()  # start de beurtwissel -odessa
+        '''
+        # Wissel beurt + aantal beurten geweest
+        # Toon direct resultaat
+        self.turn_label.config(
+            text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'}"
+        ) # toon direct resultaat op de turn label of het schot raak of mis was -odessa
+
+        # Eén schot verbruikt
+        self.shots_left -= 1
+        self.shots_label.config(text=f"Schoten resterend: {self.shots_left}")
+
+        # Als er nog schoten over zijn, blijft dezelfde speler aan de beurt.
+        if self.shots_left > 0:
+            # Board blijft actief; reeds geschoten tegels staan al disabled.
+            # Eventueel het bord even “refreshed” tonen:
+            self._refresh_view()
+            return
+
+        # Anders: schoten op -> beurt wisselen
+        self._set_board_enabled(False)
         self.root.update()   # update GUI zodat resultaat zichtbaar is voordat het wisselscherm opent -odessa
         self._switch_turn()  # start de beurtwissel -odessa
 
