@@ -25,7 +25,7 @@ SCHEEPS_SPEC = [
     ("Vliegdekschip",   Vliegdekschip,    5, "#4c1d95"),
     ("Slagschip",       Slagschip,        4, "#B91C1C"),
     ("Onderzeeër",      Onderzeeër,       3, "#374151"),
-    ("Torpedobootjager",    Torpedobootjager, 3, "#c14a09"), # 'Torpedojager' aangepast naar 'Torpedobootjager' -odessa 
+    ("Torpedobootjager",Torpedobootjager, 3, "#c14a09"), # 'Torpedojager' aangepast naar 'Torpedobootjager' -odessa 
     ("Patrouilleschip", Patrouilleschip,  2, "#59a14f"),
 ]
 
@@ -239,6 +239,7 @@ class PlaatsingsUI(tk.Frame):
 
     # Kijkt wanneer er op de linker muisknop word gedrukt om een schip te plaatsen, en of die spot wel vrij is, anders doet het niets
     def _linker_klik(self, e):
+        """Alle functies achter en op het bord aan de linker kant"""
         if not self.geselecteerde_sleutel:
             messagebox.showinfo("Kies schip", "Selecteer eerst een schip links in de balk."); return
         rij, kol = e.y // CEL_GROOTTE, e.x // CEL_GROOTTE
@@ -259,6 +260,7 @@ class PlaatsingsUI(tk.Frame):
 
     # Kijkt wanneer er op de rechter muisknop word gerukt en of er een schip is en haalt die dan weg
     def _rechter_klik(self, e):
+        """Alle functies achter en op het bord aan de rechter kant"""
         rij, kol = e.y // CEL_GROOTTE, e.x // CEL_GROOTTE
         if not self._binnen_bord(rij, kol): 
             return
@@ -268,13 +270,14 @@ class PlaatsingsUI(tk.Frame):
         schip = self.schepen[sleutel]
         for r, c in schip["coordinaten"]:
             self.bezet[r][c] = None
-        self.canvas.delete(f"schip_{sleutel}")
+        self.canvas.delete(f"schip_{sleutel}") 
         schip["coordinaten"], schip["geplaatst"] = [], False
         schip["knop"].config(state="normal")    # Reset de nu lege tegel om er een mogelijk nieuw schip op te kunnen zetten
         self._update_start_knop()
 
     # Haalt alle schepen in 1x van het bord af om makkelijk opnieuw te kunnen beginnen
     def _reset_alle_schepen(self):
+        """De functies achter de reset knop"""
         for schip in self.schepen.values():
             schip["coordinaten"] = []
             schip["geplaatst"] = False
@@ -422,7 +425,13 @@ class PlaatsingsUI(tk.Frame):
                 f"zodat {self.speler2_naam} zijn/haar vloot kan plaatsen."
             )
             return
-
+        
+        # Bind de speler wissel aan de "enter/return" knop
+        try:
+            self.master.bind("<Return>", self._start_spel)      # dit is de oplossing voor het dicht drukken van het scherm zonder dat je door kunt -- Mattijn
+        except Exception:
+            pass    # druk je niet op <Return> doet het niets
+        
         # Speler 2 klaar → start het spel
         vloot_speler2 = vloot
         top = tk.Toplevel(self.master) # Zet het venster bovenop al je andere vensters

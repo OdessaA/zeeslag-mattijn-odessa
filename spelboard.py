@@ -44,19 +44,19 @@ class ZeeslagGUI:
             "unknown": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_unknown64.png")),
         }
 
-        # UI: header + bord (ongewijzigd)
-        header = tk.Frame(self.root); header.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 0))
+        # GUI: header + bord (Opmaak van het venster)
+        header = tk.Frame(self.root); header.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 0)) 
         self.turn_label = tk.Label(header, text="", font=("TkDefaultFont", 12, "bold"))
         self.turn_label.pack(side="left")
         self.shots_label = tk.Label(header, text="", font=("TkDefaultFont", 10))
         self.shots_label.pack(side="left", padx=(10,0))
 
-        rules_btn = tk.Button(header, text="Regels", command=self.toon_regels)
-        rules_btn.pack(side="right", padx=(6, 0))
-        help_btn = tk.Button(header, text="Help", command=self.toon_help)
+        rules_btn = tk.Button(header, text="Regels", command=self.toon_regels) # Regels knop
+        rules_btn.pack(side="right", padx=(6, 0))  
+        help_btn = tk.Button(header, text="Help", command=self.toon_help) # Hulp knop
         help_btn.pack(side="right")
 
-        self.board_frame = tk.Frame(self.root)
+        self.board_frame = tk.Frame(self.root)  # Het grid waar zeeslap op gespeeld word tot rgl 74
         self.board_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
         for i in range(BORD_GROOTTE):
@@ -133,7 +133,7 @@ class ZeeslagGUI:
         wissel_win.title("Beurtwissel")
         wissel_win.geometry("300x150") # vaste grootte voor consistentie - odessa
         wissel_win.transient(self.root) # blijft boven het hoofdvenster - odessa
-
+        
         # Bericht in het venster van de beurtwissel -odessa
         msg = tk.Label(
             wissel_win,
@@ -143,18 +143,41 @@ class ZeeslagGUI:
         )
         msg.pack(expand=True, pady=20) # centreer bericht in venster - odess
 
-
+        # Heb de volgende functie buiten werk gezet wegens de window close probleem -- Mattijn
+        '''
         def doorgaan(): # funtie aangemaakt binnen de switch turn functie, die wordt aangeroepen wanneer iemand op de doorgaan knop drukt -odessa
             """Sluit het wisselvenster en ververst het bord voor de nieuwe speler."""
             wissel_win.destroy() # sluit het popup-venster -odessa
             self._refresh_view()   # update het bord voor de nieuwe speler -odessa    
             self._set_board_enabled(True)   # maakt het bord weer klikbaar voor de nieuwe speler -odessa
+        '''
+        # nieuwe "Doorgaan" functie met iets meer functies die issues op kunnen vangen
+        def new_continue(event=None):
+            """Sluit (indien nodig) het wisselvenster en ga door met de volgende speler."""
+            try:
+                if wissel_win.winfo_exists():
+                    wissel_win.destroy()  # sluit popup als die er nog is
+            except Exception:
+                pass  # als hij al weg is, doet het niets
+
+            # Herstel spel en input (overgenomen uit de oude)
+            self._refresh_view()
+            self._set_board_enabled(True)
+
+            # Belangrijk: unbind Enter zodat we per beurt maar één binding hebben
+            try:
+                self.root.unbind("<Return>")
+            except Exception:
+                pass
 
         # Knop om door te gaan naar de volgende speler -odessa
-        tk.Button(wissel_win, text="Doorgaan", command=doorgaan).pack(pady=5) 
+        tk.Button(wissel_win, text="Doorgaan", command=new_continue).pack(pady=5) # Heb het command aangepast van doorgaan naar de nieuwe versie -- Mattijn
         # Centreer het venster
         wissel_win.update_idletasks()  # bereken venstergrootte voordat we centreren - odessa
         
+        # maak sluiten met het kruisje gelijk aan 'Doorgaan'
+        wissel_win.protocol("WM_DELETE_WINDOW", new_continue) # Extra oplossing voor als <return> niet werkt op mac -- Mattijn
+
         # Bereken x en y voor het in het midden plaatsen van het venster -odessa
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 150 # Positie van het hoofdvenster. 300px breed, dus helft is 150, zodat de popup in het midden komt -odessa
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 75 # huidige breedte en hoogte van het hoofdvenster. 150px hoog, dus helft is 75, zodat de popup in het midden komt -odessa
