@@ -152,7 +152,7 @@ class ZeeslagGUI:
             self._set_board_enabled(True)   # maakt het bord weer klikbaar voor de nieuwe speler -odessa
         '''
         # nieuwe "Doorgaan" functie met iets meer functies die issues op kunnen vangen
-        def new_continue(event=None):
+        def new_doorgaan(event=None):
             """Sluit (indien nodig) het wisselvenster en ga door met de volgende speler."""
             try:
                 if wissel_win.winfo_exists():
@@ -169,14 +169,14 @@ class ZeeslagGUI:
                 self.root.unbind("<Return>")
             except Exception:
                 pass
-
+        
         # Knop om door te gaan naar de volgende speler -odessa
-        tk.Button(wissel_win, text="Doorgaan", command=new_continue).pack(pady=5) # Heb het command aangepast van doorgaan naar de nieuwe versie -- Mattijn
+        tk.Button(wissel_win, text="Doorgaan", command=new_doorgaan).pack(pady=5) # Heb het command aangepast van doorgaan naar de nieuwe versie -- Mattijn
         # Centreer het venster
         wissel_win.update_idletasks()  # bereken venstergrootte voordat we centreren - odessa
         
         # maak sluiten met het kruisje gelijk aan 'Doorgaan'
-        wissel_win.protocol("WM_DELETE_WINDOW", new_continue) # Extra oplossing voor als <return> niet werkt op mac -- Mattijn
+        wissel_win.protocol("WM_DELETE_WINDOW", new_doorgaan) # Extra oplossing voor als <return> niet werkt op mac -- Mattijn
 
         # Bereken x en y voor het in het midden plaatsen van het venster -odessa
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 150 # Positie van het hoofdvenster. 300px breed, dus helft is 150, zodat de popup in het midden komt -odessa
@@ -234,14 +234,14 @@ class ZeeslagGUI:
                     pady=10
                 ).pack()
 
-        # Geen winst? Schotteller verlagen en evt. beurt wisselen
-        self.shots_left -= 1
-        if self.shots_left <= 0:
-            self._switch_turn()
-        else:
-            # Zelfde speler schiet nogmaals; update labels en laat bord actief
-            self._refresh_view()
-            self._set_board_enabled(True)
+            # Geen winst? Schotteller verlagen en evt. beurt wisselen
+            self.shots_left -= 1
+            if self.shots_left <= 0:
+                self._switch_turn()
+            else:
+                # Zelfde speler schiet nogmaals; update labels en laat bord actief
+                self._refresh_view()
+                self._set_board_enabled(True)
 
             # Toon scores van beide spelers -odessa
             tk.Label(

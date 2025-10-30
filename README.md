@@ -46,6 +46,17 @@ Hoe groter het schip, hoe makkelijker het te raken is - dus verstop ze goed!
 - Je ziet meteen of je schot raak of mis was.  
 - Na elke beurt verschijnt een **wisselscherm** zodat spelers eerlijk kunnen afwisselen.
 
+**Custom mode**
+tijdens het plaatsen van de shepen is er een knop waar je een paar instellingen kunt aanpassen:
+- `aantal schepen` - Pas aan hoeveel schepen je kunt plaatsen.
+- `aantal shoten` - Pas het aantal schoten aan dat je kunt doen voordat de beurt wisseld.
+
+een aantal andere aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
+- afbeelding aanpassen, vervang de image in `/img` met een andere foto van de afmeting 64x64 (of groter), zorg wel dat alle afbeeldingen dezelfde grote hebben.
+    LET OP!!, is je afbeelding groter dan 64x64. pas dan ook de variable **BORD_GROOTE** aan naar de grote van de afbeelding.
+- de kleuren van het schepen plaatsen, pas in `place_ships.py` de HEX-codes van de de variabelen in **SCHEEPS_SPES** aan.
+- 
+
 ## Modules 
   - `main.py` – start het spel  
   - `place_ships.py` – plaatsen van schepen  
@@ -53,7 +64,7 @@ Hoe groter het schip, hoe makkelijker het te raken is - dus verstop ze goed!
   - `ships.py` – definities van schepen  
   - `spelboard.py` – spelbord en beurtwisseling  
 
-Afbeeldingen voor de tegels en schepen staan in de map **`img/`**.
+Afbeeldingen voor de tegels en schepen staan in de map **`/img`**.
 
 ## Samenvatting project 
 In ons project maken we gebruik van **object oriented programming (OOP)**, **Graphical User Interface (GUI)** en verschillende modules. 

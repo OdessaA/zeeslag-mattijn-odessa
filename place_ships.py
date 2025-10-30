@@ -93,15 +93,15 @@ class PlaatsingsUI(tk.Frame):
         
         # Knoppen
         # Maakt een knop die alle schepen van het bord kan halen met behulp van de functie: "_reset_alle_schepen"
-        tk.Button(links, text="Alles wissen", command=self._reset_alle_schepen).pack(anchor="w")
+        tk.Button(links, text="Alles wissen", width=12, command=self._reset_alle_schepen).pack(anchor="w") # width is de grote van de knop
         # Maakt een hulp knop en zet deze onder de knop van reset
-        tk.Button(links, text="Help", width=9, command=self.toon_help).pack(anchor="w", pady=(4, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
+        tk.Button(links, text="Help", width=12, command=self.toon_help).pack(anchor="w", pady=(4, 0)) # Deze heeft wel een width statement, want help is te kort om een standaart lengte van 9 te halen
         # Instellingen-knop 
-        tk.Button(links, text="⚙ Instellingen", command=self._open_instellingen).pack(anchor="w", pady=(6, 0))
+        tk.Button(links, text="⚙ Instellingen", command=self._open_instellingen).pack(anchor="w", pady=(8, 0))
 
         # Maakt een start knop om de boten door te sturen naar het spelbord
         tk.Frame(actiebalk).pack(side="left", expand=True, fill="x")
-        self.start_knop = tk.Button(actiebalk, text="Start spel", state="disabled", command=self._start_spel) # De disabeld komt omdat uit nature hij uit staat tot de waarde in "_update_start_knop" is uitgevoerd, waarna het de waarde enabled(default) krijgt
+        self.start_knop = tk.Button(actiebalk,width=12, text="Start spel", state="disabled", command=self._start_spel) # De disabeld komt omdat uit nature hij uit staat tot de waarde in "_update_start_knop" is uitgevoerd, waarna het de waarde enabled(default) krijgt
         self.start_knop.pack(side="right") # Deze heeft er ook de waarde right bij waardoor hij dus rechts van de linker knoppen komt
 
         # --- WRAPPER om labels + canvas te kunnen combineren ---
