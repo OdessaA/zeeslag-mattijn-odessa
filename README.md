@@ -4,6 +4,8 @@ Dit is een digitale versie van het strategische Zeeslag bordspel.
 
 De code is geschreven in **Python 3** met de python library **Tkinter** voor de Graphical User Interface. 
 
+Om het spel te kunnen spelen run je het bestand `main.py`. 
+
 ## Spelbeschrijving 
 
 Onze versie van zeeslag speel je met twee spelers die het tegen elkaar opnemen. 
@@ -46,21 +48,24 @@ Hoe groter het schip, hoe makkelijker het te raken is - dus verstop ze goed!
 - Na elke beurt verschijnt een **wisselscherm** zodat spelers eerlijk kunnen afwisselen.
 
 ## Custom mode
-tijdens het plaatsen van de shepen is er een knop waar je een paar instellingen kunt aanpassen:
-- `aantal schepen` - Pas aan hoeveel schepen je kunt plaatsen.
-- `aantal shoten` - Pas het aantal schoten aan dat je kunt doen voordat de beurt wisseld.
+Tijdens het plaatsen van de shepen is er een knop **Instellingen** waar je twee instellingen kunt aanpassen:
+- `Aantal schepen` - Pas aan hoeveel schepen iedere speler krijgt. 
+- `Aantal shoten` - Pas het het aantal schoten aan dat elke speler per beurt krijgt voordat de beurt wisselt. 
 
-druk na het aanpassen op toepassen, dan start het spel opnieuw op met de nieuwe settings.
-_het aanpassen van het aantal schepen kan niet boven de 5 met de huidige backbone_
+Druk na het aanpassen op 'toepassen', dan start het spel met de nieuwe instellingen.
+_Je kunt niet meer dan vijf schepen per speler hebben in de huidige code._
 
-### andere aanpassingen 
-andere aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
-- afbeelding aanpassen, vervang de image in `/img` met een andere foto van de afmeting 64x64 (of groter), zorg wel dat alle afbeeldingen dezelfde grote hebben.
-    __LET OP!!__, is je afbeelding groter dan 64x64. pas dan ook de variable **CEL_GROOTE** aan naar de grote van de afbeelding!
-- de kleuren van het schepen plaatsen, pas in `place_ships.py` de HEX-codes van de de variabelen in **SCHEEPS_SPEC** aan.
-- grote van een schip aanpassen, ga naar `ships.py` en pas het nummer dat voorin de haakjes staat, pas dit getal ook aan in `place_ships.py` bij **SCHEEPS_SPEC**.
-- bord grootte aanpassen, ga naar `place_ships.py` & `spelboard.py` en pas daar de waarde van **BORD_GROOTTE** aan.
-    __LET OP!!__, zorg er wel voor dat de 2 waardes gelijk zijn. Anders kun je schepen in de nieuwe vakjes niet raken!
+### Overige aanpassingen 
+Overige aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
+- **Afbeelding aanpassen:** vervang de huidige png's in `/img` met andere png's met de afmetingen 64x64 (of groter), zorg er wel voor dat alle afbeeldingen dezelfde grootte hebben.
+    __LET OP!__ Is je afbeelding groter dan 64x64, pas dan ook de variabele **CEL_GROOTE** aan naar de grootte van de afbeelding!
+
+- **De kleuren van het schepen plaatsen:** pas in `place_ships.py` de HEX-codes van de de variabelen van **SCHEEPS_SPEC** aan.
+
+- **Grootte van een schip aanpassen:** ga naar `ships.py` en pas het nummer dat voorin de haakjes staat aan, pas dit getal ook aan in `place_ships.py` bij **SCHEEPS_SPEC**.
+
+- **Bord grootte aanpassen** ga naar `place_ships.py` & `spelboard.py` en pas daar de waarde van **BORD_GROOTTE** aan.
+    __LET OP!__ Zorg er wel voor dat de 2 waardes gelijk zijn. Anders kun je schepen in de nieuwe vakjes niet raken!
 
 ## Modules 
   - `main.py` – start het spel  
