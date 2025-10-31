@@ -2,9 +2,7 @@
 Welkom bij het spel **Zeeslag**! 
 Dit is een digitale versie van het strategische Zeeslag bordspel.
 
-De code is geschreven in **Python 3** met de python librrary **Tkinter** voor de GUI. 
-
--- 
+De code is geschreven in **Python 3** met de python library **Tkinter** voor de Graphical User Interface. 
 
 ## Spelbeschrijving 
 
@@ -27,8 +25,9 @@ Je wint het spel wanneer je **alle vakjes van de vijandelijke schepen** hebt ger
 | Patrouilleschip    | 2 vakjes | Groen |
 
 Er zijn 5 soorten schepen. 
+Standaard heeft elke speler 5 schepen, dit kan aangepast worden (zie custom mode). 
 Ieder schip heeft zijn eigen naam, lengte en kleur. 
-Iedere speler elk schip één keer op zijn bord. 
+Iedere speler zet elk schip één keer op zijn bord. 
 
 Hoe groter het schip, hoe makkelijker het te raken is - dus verstop ze goed! 
 
@@ -43,18 +42,18 @@ Hoe groter het schip, hoe makkelijker het te raken is - dus verstop ze goed!
 
 **Tijdens het spel**
 - Klik op een vakje om te schieten.  
-- Je ziet meteen of je schot raak of mis was.  
+- Je ziet meteen of je schot raak of mis was boven in het scherm. 
 - Na elke beurt verschijnt een **wisselscherm** zodat spelers eerlijk kunnen afwisselen.
 
 **Custom mode**
-tijdens het plaatsen van de shepen is er een knop waar je een paar instellingen kunt aanpassen:
-- `aantal schepen` - Pas aan hoeveel schepen je kunt plaatsen.
-- `aantal shoten` - Pas het aantal schoten aan dat je kunt doen voordat de beurt wisseld.
+Tijdens het plaatsen van de schepen is er een knop **Instellingen** waarmee je twee instellingen kunt aanpassen:
+- `Aantal schepen` - Pas aan hoeveel schepen elke speler krijgt. 
+- `Aantal shoten` - Pas het aantal schoten aan dat je per beurt hebt voordat de beurten wisselen. 
 
-een aantal andere aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
-- afbeelding aanpassen, vervang de image in `/img` met een andere foto van de afmeting 64x64 (of groter), zorg wel dat alle afbeeldingen dezelfde grote hebben.
-    LET OP!!, is je afbeelding groter dan 64x64. pas dan ook de variable **BORD_GROOTE** aan naar de grote van de afbeelding.
-- de kleuren van het schepen plaatsen, pas in `place_ships.py` de HEX-codes van de de variabelen in **SCHEEPS_SPES** aan.
+Een aantal andere aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
+- Afbeelding aanpassen, vervang de image in `/img` de huidige png's met andere png's met afmetingen 64x64 (of groter), zorg wel dat alle afbeeldingen dezelfde grootte hebben.
+    LET OP! Is je afbeelding groter dan 64x64. Pas dan ook de variabele **BORD_GROOTE** (hoe groot het speelscherm is) aan naar de grootte van de afbeelding.
+- De kleuren van het schepen plaatsen, pas in `place_ships.py` de HEX-codes van de de variabelen in **SCHEEPS_SPES** aan.
 - 
 
 ## Modules 
