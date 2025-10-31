@@ -5,9 +5,7 @@ Zorgt ervoor dat er een boot geplaatst kan worden op een makkelijke manier
 Gemaakt door:   Mattijn Thijert
                 Odessa Al-Dib
 '''
-#---------------------------------------------------------------------------------
-"""Tkinter uitleg toevoegen"""
-#---------------------------------------------------------------------------------
+
 import tkinter as tk
 from tkinter import messagebox
 from ships import Patrouilleschip, Onderzeeër, Torpedobootjager, Slagschip, Vliegdekschip
@@ -34,7 +32,27 @@ IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class PlaatsingsUI(tk.Frame):
+    """Samenvatting van PlaatsingGUI
+    
+    __init__
+    _selecteer_schip
+    _binnen_bord
+    _voetafdruk
+    _plek_vrij
+    _teken_cel
+    toon_help
+    _muis_beweging
+    _linker_klik
+    _rechter_klik
+    _reset_alle_schepen
+    _alle_geplaatst
+    _update_start_knop
+    _herstart_met_settings
+    _open_instellingen
+    _start_spel
+    """
     def __init__(self, master, speler1_naam="Speler 1", speler2_naam="Speler 2"):
+        """Klassevariablen zetten en Tkinter bord opzetten"""
         super().__init__(master); self.grid(sticky="nsew")  # geef alle toestemmingen aan self.grid
         self.speler1_naam = speler1_naam # Zet de naam van speler 1 in een variabele -odessa
         self.speler2_naam = speler2_naam # Zet de naam van speler 2 in een variabele -odessa
@@ -186,30 +204,33 @@ class PlaatsingsUI(tk.Frame):
         self.vloot_speler1 = None
 
     # ---------- helpers ----------                                                                                                                                                                                                                                                             help mij ook, moet dit niet doen om half 2
-    """Dit zijn functies die zorgen dat __init__ kan werken"""
-    # Deze functie zorgt dat je maar 1 schip van elk soort kunt plaatsen
+    # Dit zijn functies die zorgen dat __init__ kan werken
     def _selecteer_schip(self, sleutel):
+        """zorg dat je maar 1 schip van elk soort kunt plaatsen"""
         if self.schepen[sleutel]["geplaatst"]:
             return
         self.geselecteerde_sleutel = sleutel
         for k, schip in self.schepen.items():
             schip["knop"].config(relief=("sunken" if k == sleutel else "raised"))
 
-    # Checked of alle spots van het schip binnen het veld vallen
     def _binnen_bord(self, rij, kol): 
+        """Check of alle spots van het schip binnen het veld vallen"""
         return 0 <= rij < BORD_GROOTTE and 0 <= kol < BORD_GROOTTE
 
     
     def _voetafdruk(self, rij, kol, lengte, orient):
+        """Pas de grote aan van het schip tussen Horizontaal & Verticaal"""
         return ([(rij, kol+i) for i in range(lengte)] if orient == "H"
                 else [(rij+i, kol) for i in range(lengte)])
 
-    # Checked of alle spots nog vrij zijn en niet of er al een ander schip ligt
+    # 
     def _plek_vrij(self, coords):
+        """Check of alle spots nog vrij zijn en niet of er al een ander schip ligt"""
         return all(self._binnen_bord(r, c) and self.bezet[r][c] is None for r, c in coords)
 
     # Maakt de cellen aan waar schepen geplaatst kunnen worden
     def _teken_cel(self, rij, kol, **kwargs):
+        """Maak een cel aan met een knopfunctie"""
         x0, y0 = kol*CEL_GROOTTE+1, rij*CEL_GROOTTE+1
         x1, y1 = x0+CEL_GROOTTE-2, y0+CEL_GROOTTE-2
         return self.canvas.create_rectangle(x0, y0, x1, y1, **kwargs)

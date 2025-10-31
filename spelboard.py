@@ -22,7 +22,23 @@ IMG_PAD = os.path.join(os.path.dirname(__file__), 'img')
 
 
 class ZeeslagGUI:
+    """Samenvatting van ZeeslagGUI.
+
+    __init__
+    _current_player
+    _opponent_player
+    _current_name
+    _opponent_name
+    _refresh_vieuw
+    _set_board_enabled
+    _switch_turn
+    doorgaan
+    klik
+     - opnieuw_spelen
+     - afsluiten
+    """
     def __init__(self, root, *, player1, player2, shots_per_turn=1):
+        """Klassevariablen zetten en Tkinter bord opzetten"""
         self.root = root
         self.root.title("Zeeslag (2 spelers)")
 
@@ -39,7 +55,6 @@ class ZeeslagGUI:
         cfg_shots = settings.get("shots_per_turn", shots_per_turn)
         self.shots_per_turn = max(1, int(cfg_shots))
         self.shots_left = self.shots_per_turn
-
         # Afbeeldingen
         self.images = {
             "hit": tk.PhotoImage(file=os.path.join(IMG_PAD, "Battleship_hit64.png")),
@@ -83,18 +98,23 @@ class ZeeslagGUI:
 
     # ---- helpers ----
     def _current_player(self):
+        """Speler 1 aan de beurt"""
         return self.p1 if self.current == 1 else self.p2
 
     def _opponent_player(self):
+        """Speler 2 aan de beurt"""
         return self.p2 if self.current == 1 else self.p1
 
     def _current_name(self):
+        """naam van speler1"""
         return self._current_player().name
 
     def _opponent_name(self):
+        """Naam van de tegenspeler"""
         return self._opponent_player().name
 
     def _refresh_view(self):
+        """Update de tegel/cel/knop"""
         self.root.title(f"{self._current_name()}: Schiet een schot")
         self.turn_label.config(text=f"Beurt: {self._current_name()} — schiet op {self._opponent_name()}")
         self.shots_label.config(text=f"Schoten resterend: {self.shots_left}") # Toon resterende schoten voor de huidige speler
@@ -114,6 +134,7 @@ class ZeeslagGUI:
                     btn.config(image=self.images[state], state="disabled")
 
     def _set_board_enabled(self, enabled: bool):
+        """Zet het klikken op het bord op aan/uit (enabled/disabled)"""
         state = "normal" if enabled else "disabled"
         for r in range(BORD_GROOTTE):
             for c in range(BORD_GROOTTE):
@@ -146,16 +167,7 @@ class ZeeslagGUI:
         )
         msg.pack(expand=True, pady=20) # centreer bericht in venster - odess
 
-        # Heb de volgende functie buiten werk gezet wegens de window close probleem -- Mattijn
-        '''
-        def doorgaan(): # funtie aangemaakt binnen de switch turn functie, die wordt aangeroepen wanneer iemand op de doorgaan knop drukt -odessa
-            """Sluit het wisselvenster en ververst het bord voor de nieuwe speler."""
-            wissel_win.destroy() # sluit het popup-venster -odessa
-            self._refresh_view()   # update het bord voor de nieuwe speler -odessa    
-            self._set_board_enabled(True)   # maakt het bord weer klikbaar voor de nieuwe speler -odessa
-        '''
-        # nieuwe "Doorgaan" functie met iets meer functies die issues op kunnen vangen
-        def new_doorgaan(event=None):
+        def doorgaan(event=None):
             """Sluit (indien nodig) het wisselvenster en ga door met de volgende speler."""
             try:
                 if wissel_win.winfo_exists():
@@ -174,12 +186,12 @@ class ZeeslagGUI:
                 pass
         
         # Knop om door te gaan naar de volgende speler -odessa
-        tk.Button(wissel_win, text="Doorgaan", command=new_doorgaan).pack(pady=5) # Heb het command aangepast van doorgaan naar de nieuwe versie -- Mattijn
+        tk.Button(wissel_win, text="Doorgaan", command=doorgaan).pack(pady=5) # Heb het command aangepast van doorgaan naar de nieuwe versie -- Mattijn
         # Centreer het venster
         wissel_win.update_idletasks()  # bereken venstergrootte voordat we centreren - odessa
         
         # maak sluiten met het kruisje gelijk aan 'Doorgaan'
-        wissel_win.protocol("WM_DELETE_WINDOW", new_doorgaan) # Extra oplossing voor als <return> niet werkt op mac -- Mattijn
+        wissel_win.protocol("WM_DELETE_WINDOW", doorgaan) # Extra oplossing voor als <return> niet werkt op mac -- Mattijn
 
         # Bereken x en y voor het in het midden plaatsen van het venster -odessa
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 150 # Positie van het hoofdvenster. 300px breed, dus helft is 150, zodat de popup in het midden komt -odessa
@@ -193,6 +205,7 @@ class ZeeslagGUI:
 
     # ---- interactie ----
     def klik(self, r, c):
+        """de functie achter de wekzaamheden als je klinkt op een tegel/cel/knop om te kijken wat er gaande is"""
         shooter = self._current_player()
         target  = self._opponent_player()
 
@@ -270,18 +283,8 @@ class ZeeslagGUI:
                 for cc in range(BORD_GROOTTE):
                     self.buttons[rr][cc].config(state="disabled")
 
-            return  # <<< BELANGRIJK! stop hier, zodat er geen beurtwissel meer volgt
+            return
 
-        ''' De oude functie
-        # Wissel beurt -odessa
-        self._set_board_enabled(False) # maak bord tijdelijk niet klikbaar, zodat spelers niet meerdere keren snel achter elkaar kunnen klikken. -odessa
-        self.turn_label.config(
-            text=f"{shooter.name} schoot: {'Raak!' if is_hit else 'Mis!'}"
-        ) # toon direct resultaat op de turn label of het schot raak of mis was -odessa
-
-        self.root.update()   # update GUI zodat resultaat zichtbaar is voordat het wisselscherm opent -odessa
-        self._switch_turn()  # start de beurtwissel -odessa
-        '''
         # Wissel beurt + aantal beurten geweest
         # Toon direct resultaat
         self.turn_label.config(
@@ -304,7 +307,7 @@ class ZeeslagGUI:
         self.root.update()   # update GUI zodat resultaat zichtbaar is voordat het wisselscherm opent -odessa
         self._switch_turn()  # start de beurtwissel -odessa
 
-    # -------- Info --------
+    # ---- Info ----
     def toon_help(self):
         """Toont korte uitleg over de bediening tijdens het spel."""
         messagebox.showinfo(
