@@ -45,16 +45,22 @@ Hoe groter het schip, hoe makkelijker het te raken is - dus verstop ze goed!
 - Je ziet meteen of je schot raak of mis was boven in het scherm. 
 - Na elke beurt verschijnt een **wisselscherm** zodat spelers eerlijk kunnen afwisselen.
 
-**Custom mode**
-Tijdens het plaatsen van de schepen is er een knop **Instellingen** waarmee je twee instellingen kunt aanpassen:
-- `Aantal schepen` - Pas aan hoeveel schepen elke speler krijgt. 
-- `Aantal shoten` - Pas het aantal schoten aan dat je per beurt hebt voordat de beurten wisselen. 
+## Custom mode
+tijdens het plaatsen van de shepen is er een knop waar je een paar instellingen kunt aanpassen:
+- `aantal schepen` - Pas aan hoeveel schepen je kunt plaatsen.
+- `aantal shoten` - Pas het aantal schoten aan dat je kunt doen voordat de beurt wisseld.
 
-Een aantal andere aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
-- Afbeelding aanpassen, vervang de image in `/img` de huidige png's met andere png's met afmetingen 64x64 (of groter), zorg wel dat alle afbeeldingen dezelfde grootte hebben.
-    LET OP! Is je afbeelding groter dan 64x64. Pas dan ook de variabele **BORD_GROOTE** (hoe groot het speelscherm is) aan naar de grootte van de afbeelding.
-- De kleuren van het schepen plaatsen, pas in `place_ships.py` de HEX-codes van de de variabelen in **SCHEEPS_SPES** aan.
-- 
+druk na het aanpassen op toepassen, dan start het spel opnieuw op met de nieuwe settings.
+_het aanpassen van het aantal schepen kan niet boven de 5 met de huidige backbone_
+
+### andere aanpassingen 
+andere aanpassingen die je kunt doen met uitleg over hoe je het aanpast:
+- afbeelding aanpassen, vervang de image in `/img` met een andere foto van de afmeting 64x64 (of groter), zorg wel dat alle afbeeldingen dezelfde grote hebben.
+    __LET OP!!__, is je afbeelding groter dan 64x64. pas dan ook de variable **CEL_GROOTE** aan naar de grote van de afbeelding!
+- de kleuren van het schepen plaatsen, pas in `place_ships.py` de HEX-codes van de de variabelen in **SCHEEPS_SPEC** aan.
+- grote van een schip aanpassen, ga naar `ships.py` en pas het nummer dat voorin de haakjes staat, pas dit getal ook aan in `place_ships.py` bij **SCHEEPS_SPEC**.
+- bord grootte aanpassen, ga naar `place_ships.py` & `spelboard.py` en pas daar de waarde van **BORD_GROOTTE** aan.
+    __LET OP!!__, zorg er wel voor dat de 2 waardes gelijk zijn. Anders kun je schepen in de nieuwe vakjes niet raken!
 
 ## Modules 
   - `main.py` – start het spel  

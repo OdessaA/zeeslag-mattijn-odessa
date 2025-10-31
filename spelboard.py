@@ -15,7 +15,7 @@ from tkinter import messagebox
 from players import Player
 
 # Grootte van het bord
-BORD_GROOTTE = 10
+BORD_GROOTTE = 10       # standaard waarde 10
 
 # Pad naar de PNG-bestanden
 IMG_PAD = os.path.join(os.path.dirname(__file__), "img")

@@ -25,16 +25,16 @@ from spelboard import ZeeslagGUI
 
 # --------------------------------------------------------------------------------------------------
 
-BORD_GROOTTE = 10
-CEL_GROOTTE = 64
+BORD_GROOTTE = 10       # standaard waarde 10
+CEL_GROOTTE = 64        # standaard waarde 64
 BORD_PIXELS = BORD_GROOTTE * CEL_GROOTTE
 
 SCHEEPS_SPEC = [
-    ("Vliegdekschip", Vliegdekschip, 5, "#4c1d95"),
-    ("Slagschip", Slagschip, 4, "#B91C1C"),
-    ("Onderzeeër", Onderzeeër, 3, "#374151"),
-    ("Torpedobootjager", Torpedobootjager, 3, "#c14a09"),
-    ("Patrouilleschip", Patrouilleschip, 2, "#59a14f"),
+    ("Vliegdekschip",   Vliegdekschip,    5, "#4c1d95"), # standaard kleur: #4c1d95
+    ("Slagschip",       Slagschip,        4, "#b91c1c"), # standaard kleur: #b91c1c
+    ("Onderzeeër",      Onderzeeër,       3, "#374151"), # standaard kleur: #374151
+    ("Torpedobootjager",Torpedobootjager, 3, "#c14a09"), # standaard kleur: #c14a09                                   # 'Torpedojager' aangepast naar 'Torpedobootjager' -odessa 
+    ("Patrouilleschip", Patrouilleschip,  2, "#59a14f"), # standaard kleur: #59a14f
 ]
 
 # Maakt de route duidelijk tot de map met de pixelarts
